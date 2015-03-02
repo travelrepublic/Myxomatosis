@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>TravelRepublic.RxRabbitMqClient</id>
+    <authors>Travel Republic</authors>
+    <description>Rabbit MQ Client leverating reactive extensions.</description>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="6.0.1" targetFramework="net45" />
+      <dependency id="RabbitMQ.Client" version="3.3.0" targetFramework="net45" />
+      <dependency id="Rx-Linq" version="2.2.0" targetFramework="net45" />
+    </dependencies>
+  </metadata>
+</package>
