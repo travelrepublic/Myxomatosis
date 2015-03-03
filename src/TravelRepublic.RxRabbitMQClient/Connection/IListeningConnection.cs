@@ -5,11 +5,11 @@ namespace TravelRepublic.RxRabbitMQClient.Connection
 {
     public interface IListeningConnection<T> : IOpenConnection
     {
-        IObservable<RabbitMessage<T>> MessageSource { get; }
+        IObservable<RabbitMessage<T>> ToObservable();
     }
 
     public interface IListeningConnection : IOpenConnection
     {
-        IObservable<RabbitMessage> MessageSource { get; }
+        IObservable<RabbitMessage> ToObservable();
     }
 }

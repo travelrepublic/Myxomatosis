@@ -43,22 +43,19 @@ namespace TravelRepublic.RxRabbitMQClient.Api
             return _listeningConnection.Close(closeTimeout);
         }
 
-        public IObservable<RabbitMessage<T>> MessageSource
+        public IObservable<RabbitMessage<T>> ToObservable()
         {
-            get
-            {
-                return _listeningConnection.MessageSource
-                    .Select(m => new RabbitMessage<T>
-                    {
-                        DeliveryTag = m.DeliveryTag,
-                        Channel = m.Channel,
-                        RawHeaders = m.RawHeaders,
-                        Headers = m.RawHeaders.ToDictionary(i => i.Key, i => _serializer.Deserialize<object>(i.Value)),
-                        RawMessage = m.RawMessage,
-                        Message = _serializer.Deserialize<T>(m.RawMessage),
-                        ErrorHandler = m.ErrorHandler
-                    });
-            }
+            return _listeningConnection.ToObservable()
+                .Select(m => new RabbitMessage<T>
+                {
+                    DeliveryTag = m.DeliveryTag,
+                    Channel = m.Channel,
+                    RawHeaders = m.RawHeaders,
+                    Headers = m.RawHeaders.ToDictionary(i => i.Key, i => _serializer.Deserialize<object>(i.Value)),
+                    RawMessage = m.RawMessage,
+                    Message = _serializer.Deserialize<T>(m.RawMessage),
+                    ErrorHandler = m.ErrorHandler
+                });
         }
 
         #endregion IListeningConnection<T> Members
@@ -82,9 +79,9 @@ namespace TravelRepublic.RxRabbitMQClient.Api
 
         #region IListeningConnection Members
 
-        public IObservable<RabbitMessage> MessageSource
+        public IObservable<RabbitMessage> ToObservable()
         {
-            get { return _transform(_queueSubscription.MessageSource); }
+            return _transform(_queueSubscription.MessageSource);
         }
 
         #endregion IListeningConnection Members

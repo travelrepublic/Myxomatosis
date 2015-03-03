@@ -12,9 +12,8 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
     [TestFixture]
     internal class IntegrationTests
     {
-        private IListeningConnection<MyMessage> _subscription;
-
         private IRabbitQueue<MyMessage> _queueConnection;
+        private IListeningConnection<MyMessage> _subscription;
 
         [SetUp]
         public void Init()
@@ -22,13 +21,13 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
             _queueConnection = ObservableConnectionFactory.Create()
                 .GetQueue<MyMessage>("TestExchange", "TestQueue");
 
-            Enumerable.Range(0, 10).ToList().ForEach(i => { _queueConnection.Publish(new MyMessage { Message = "Message: " + i }); });
+            Enumerable.Range(0, 10).ToList().ForEach(i => { _queueConnection.Publish(new MyMessage {Message = "Message: " + i}); });
         }
 
         [Test]
         public void SimpleTest()
         {
-            _subscription.MessageSource
+            _subscription.ToObservable()
                 .SimpleSubscribe(rm => { Console.WriteLine("Recieved message: " + rm.Message.Message); });
 
             Task.Delay(TimeSpan.FromSeconds(5));
@@ -41,8 +40,8 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
         {
             _subscription = _queueConnection.Listen(TimeSpan.FromSeconds(1), Filter);
             _subscription
-            .MessageSource
-            .SimpleSubscribe(rm => { Console.WriteLine("Recieved message: " + rm.Message.Message); });
+                .ToObservable()
+                .SimpleSubscribe(rm => { Console.WriteLine("Recieved message: " + rm.Message.Message); });
 
             Task.Delay(TimeSpan.FromSeconds(5));
 

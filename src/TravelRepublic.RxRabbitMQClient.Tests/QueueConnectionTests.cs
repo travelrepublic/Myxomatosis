@@ -1,6 +1,6 @@
+using NUnit.Framework;
 using System;
 using System.Threading.Tasks;
-using NUnit.Framework;
 using TravelRepublic.RxRabbitMQClient.Tests.Helpers;
 
 namespace TravelRepublic.RxRabbitMQClient.Tests
@@ -8,10 +8,9 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
     [TestFixture]
     public class QueueConnectionTests
     {
-        private FactoryHelper _factoryHelper;
-
         private const string QueueName = "Queue";
         private const string Exchange = "Ex";
+        private FactoryHelper _factoryHelper;
 
         [SetUp]
         public void Init()
@@ -51,14 +50,14 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
                 .GetListener()
                 .GetQueue(Exchange, QueueName)
                 .Listen(TimeSpan.FromSeconds(10))
-                .MessageSource
+                .ToObservable()
                 .Subscribe(m => { });
 
             Assert.IsNotNull(subscription);
         }
 
         [Test]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof (Exception))]
         public void SubscribeToUnOpenedConnectionThrowsException()
         {
             _factoryHelper
@@ -66,7 +65,7 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
                 .GetListener()
                 .GetQueue(Exchange, QueueName)
                 .Listen(TimeSpan.FromSeconds(1))
-                .MessageSource
+                .ToObservable()
                 .Subscribe(m => { });
         }
 
@@ -115,12 +114,10 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
             Task.Delay(TimeSpan.FromSeconds(4));
 
             Assert.IsFalse(openConnection.IsOpen);
-
-
         }
 
         [Test]
-        [ExpectedException(typeof(Exception))]
+        [ExpectedException(typeof (Exception))]
         public void UnOpenedConnectionThrowsExceptionOnClose()
         {
             _factoryHelper

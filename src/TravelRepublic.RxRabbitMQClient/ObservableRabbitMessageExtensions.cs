@@ -49,7 +49,7 @@ namespace TravelRepublic.RxRabbitMQClient
         {
             return connection.GetQueue<T>(config.Exchange, config.QueueName)
                 .Listen(config.OpenTimeout)
-                .MessageSource
+                .ToObservable()
                 .Pace(config.Interval).SimpleSubscribe(rm => { handler.Handle(rm.Message); });
         }
 
@@ -57,7 +57,7 @@ namespace TravelRepublic.RxRabbitMQClient
         {
             return SimpleSubscribe(connection.GetQueue<T>(config.Exchange, config.QueueName)
                 .Listen(config.OpenTimeout)
-                .MessageSource
+                .ToObservable()
                 .Buffer(config.BufferTimeout, config.BufferSize)
                 .Pace(config.Interval)
                 .Where(m => m.Any())

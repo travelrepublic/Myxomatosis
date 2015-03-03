@@ -24,7 +24,7 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
                 .GetListener()
                 .GetQueue(Exchange, QueueName)
                 .Listen(TimeSpan.FromSeconds(10))
-                .MessageSource
+                .ToObservable()
                 .SimpleSubscribe(m => { });
 
             Assert.IsNotNull(subscription);
