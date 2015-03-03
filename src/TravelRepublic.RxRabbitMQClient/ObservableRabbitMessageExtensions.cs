@@ -81,7 +81,7 @@ namespace TravelRepublic.RxRabbitMQClient
                 _messageModels = messageModels;
             }
 
-            #endregion Constructors
+            #endregion
 
             #region IEnumerable<T> Members
 
@@ -95,7 +95,7 @@ namespace TravelRepublic.RxRabbitMQClient
                 return GetEnumerator();
             }
 
-            #endregion IEnumerable<T> Members
+            #endregion
 
             #region IRabbitMessageModel Members
 
@@ -123,9 +123,9 @@ namespace TravelRepublic.RxRabbitMQClient
                 }
             }
 
-            #endregion IRabbitMessageModel Members
+            #endregion
         }
 
-        #endregion Nested type: AggregateRabbitMessage
+        #endregion
     }
 }

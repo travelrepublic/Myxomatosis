@@ -6,20 +6,23 @@ namespace TravelRepublic.RxRabbitMQClient.Connection.Queue.Listen
     {
         private readonly ConcurrentDictionary<string, QueueSubscription> _subscriptions;
 
+        #region Constructors
+
         public SubscriptionManager()
         {
             _subscriptions = new ConcurrentDictionary<string, QueueSubscription>();
         }
 
-        public QueueSubscription GetSubscription(string exchange, string queueName, string subscriptionKey)
-        {
-            return _subscriptions.GetOrAdd(Concatenate(exchange, queueName, subscriptionKey), new QueueSubscription(exchange, queueName));
-        }
+        #endregion Constructors
+
+        #region IQueueSubscriptionManager Members
 
         public QueueSubscription GetSubscription(string exchange, string queueName)
         {
             return _subscriptions.GetOrAdd(Concatenate(exchange, queueName), new QueueSubscription(exchange, queueName));
         }
+
+        #endregion IQueueSubscriptionManager Members
 
         private string Concatenate(params string[] keys)
         {

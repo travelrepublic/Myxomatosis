@@ -96,7 +96,6 @@
     <Compile Include="Serialization\ISerializer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include=".nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
