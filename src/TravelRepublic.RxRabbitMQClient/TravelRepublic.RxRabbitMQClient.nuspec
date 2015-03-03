@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>TravelRepublic.RxRabbitMQClient</id>
-    <version>1.0.0.0</version>
+    <version>$version$</version>
     <title>TravelRepublic RabbitMQ Client</title>
     <authors>TravelRepublic</authors>
     <owners>TravelRepublic</owners>
