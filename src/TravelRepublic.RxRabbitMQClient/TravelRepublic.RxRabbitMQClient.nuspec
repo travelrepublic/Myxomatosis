@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>TravelRepublic.RxRabbitMQClient</id>
+    <version>1.0.0.0</version>
+    <title>TravelRepublic RabbitMQ Client</title>
+    <authors>TravelRepublic</authors>
+    <owners>TravelRepublic</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A client for Rabbit MQ leveraging reactive extensions.</description>
+    <copyright>Copyright 2015</copyright>
+    <tags>RabbitMQ Rx</tags>
+  </metadata>
+</package>

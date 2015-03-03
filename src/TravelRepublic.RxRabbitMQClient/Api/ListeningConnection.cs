@@ -81,9 +81,42 @@ namespace TravelRepublic.RxRabbitMQClient.Api
 
         public IObservable<RabbitMessage> ToObservable()
         {
-            return _transform(_queueSubscription.MessageSource);
+            /**
+             * When the subscriber is disposed we want to dispose of the underlying connection
+             * */
+            return Observable.Using(() => new ConnectionDisposer(this), cd => cd.MessageStream);
         }
 
         #endregion IListeningConnection Members
+
+        #region Nested type: ConnectionDisposer
+
+        private class ConnectionDisposer : IDisposable
+        {
+            private readonly ListeningConnection _connection;
+
+            #region Constructors
+
+            public ConnectionDisposer(ListeningConnection connection)
+            {
+                _connection = connection;
+                MessageStream = connection._transform(connection._queueSubscription.MessageSource);
+            }
+
+            #endregion Constructors
+
+            public IObservable<RabbitMessage> MessageStream { get; set; }
+
+            #region IDisposable Members
+
+            public void Dispose()
+            {
+                _connection.Close();
+            }
+
+            #endregion IDisposable Members
+        }
+
+        #endregion Nested type: ConnectionDisposer
     }
 }

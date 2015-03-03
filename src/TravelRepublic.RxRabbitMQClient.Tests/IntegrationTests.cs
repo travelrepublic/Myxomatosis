@@ -21,7 +21,7 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
             _queueConnection = ObservableConnectionFactory.Create()
                 .GetQueue<MyMessage>("TestExchange", "TestQueue");
 
-            Enumerable.Range(0, 10).ToList().ForEach(i => { _queueConnection.Publish(new MyMessage {Message = "Message: " + i}); });
+            Enumerable.Range(0, 10).ToList().ForEach(i => { _queueConnection.Publish(new MyMessage { Message = "Message: " + i }); });
         }
 
         [Test]
