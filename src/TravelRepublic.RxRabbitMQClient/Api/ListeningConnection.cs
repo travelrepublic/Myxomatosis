@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Reactive.Linq;
 using TravelRepublic.RxRabbitMQClient.Connection;
 using TravelRepublic.RxRabbitMQClient.Connection.Message;
@@ -45,17 +44,7 @@ namespace TravelRepublic.RxRabbitMQClient.Api
 
         public IObservable<RabbitMessage<T>> ToObservable()
         {
-            return _listeningConnection.ToObservable()
-                .Select(m => new RabbitMessage<T>
-                {
-                    DeliveryTag = m.DeliveryTag,
-                    Channel = m.Channel,
-                    RawHeaders = m.RawHeaders,
-                    Headers = m.RawHeaders.ToDictionary(i => i.Key, i => _serializer.Deserialize<object>(i.Value)),
-                    RawMessage = m.RawMessage,
-                    Message = _serializer.Deserialize<T>(m.RawMessage),
-                    ErrorHandler = m.ErrorHandler
-                });
+            return _listeningConnection.ToObservable().ToMessage<T>();
         }
 
         #endregion IListeningConnection<T> Members

@@ -29,13 +29,13 @@ namespace TravelRepublic.RxRabbitMQClient
             });
         }
 
-        public static IDisposable SimpleSubscribe<T>(this IObservable<T> source, Action<T> action)
+        public static IDisposable SubscribeWithAck<T>(this IObservable<T> source, Action<T> action)
             where T : IRabbitMessageModel
         {
             return source.InternalSubscribe(action);
         }
 
-        public static IDisposable SimpleSubscribe<T>(this IObservable<IEnumerable<T>> messageSource, Action<IEnumerable<T>> action) where T : IRabbitMessageModel
+        public static IDisposable SubscribeWithAck<T>(this IObservable<IEnumerable<T>> messageSource, Action<IEnumerable<T>> action) where T : IRabbitMessageModel
         {
             return messageSource.Select(m => new AggregateRabbitMessage<T>(m)).InternalSubscribe<AggregateRabbitMessage<T>>(action);
         }
@@ -50,12 +50,12 @@ namespace TravelRepublic.RxRabbitMQClient
             return connection.GetQueue<T>(config.Exchange, config.QueueName)
                 .Listen(config.OpenTimeout)
                 .ToObservable()
-                .Pace(config.Interval).SimpleSubscribe(rm => { handler.Handle(rm.Message); });
+                .Pace(config.Interval).SubscribeWithAck(rm => { handler.Handle(rm.Message); });
         }
 
         public static IDisposable SubscribeOnQueueToMessage<T>(this IObservableConnection connection, IBatchSubscriptionConfig config, IRabbitMessageHandler<IEnumerable<T>> handler)
         {
-            return SimpleSubscribe(connection.GetQueue<T>(config.Exchange, config.QueueName)
+            return SubscribeWithAck(connection.GetQueue<T>(config.Exchange, config.QueueName)
                 .Listen(config.OpenTimeout)
                 .ToObservable()
                 .Buffer(config.BufferTimeout, config.BufferSize)
@@ -81,7 +81,7 @@ namespace TravelRepublic.RxRabbitMQClient
                 _messageModels = messageModels;
             }
 
-            #endregion
+            #endregion Constructors
 
             #region IEnumerable<T> Members
 
@@ -95,7 +95,7 @@ namespace TravelRepublic.RxRabbitMQClient
                 return GetEnumerator();
             }
 
-            #endregion
+            #endregion IEnumerable<T> Members
 
             #region IRabbitMessageModel Members
 
@@ -123,9 +123,9 @@ namespace TravelRepublic.RxRabbitMQClient
                 }
             }
 
-            #endregion
+            #endregion IRabbitMessageModel Members
         }
 
-        #endregion
+        #endregion Nested type: AggregateRabbitMessage
     }
 }

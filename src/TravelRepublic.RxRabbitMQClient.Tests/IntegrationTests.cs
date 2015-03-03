@@ -21,14 +21,14 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
             _queueConnection = ObservableConnectionFactory.Create()
                 .GetQueue<MyMessage>("TestExchange", "TestQueue");
 
-            Enumerable.Range(0, 10).ToList().ForEach(i => { _queueConnection.Publish(new MyMessage { Message = "Message: " + i }); });
+            Enumerable.Range(0, 10).ToList().ForEach(i => { _queueConnection.Publish(new MyMessage { Greeting = "Message: " + i }); });
         }
 
         [Test]
         public void SimpleTest()
         {
             _subscription.ToObservable()
-                .SimpleSubscribe(rm => { Console.WriteLine("Recieved message: " + rm.Message.Message); });
+                .SimpleSubscribe(rm => { Console.WriteLine("Recieved message: " + rm.Message.Greeting); });
 
             Task.Delay(TimeSpan.FromSeconds(5));
 
@@ -41,11 +41,27 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
             _subscription = _queueConnection.Listen(TimeSpan.FromSeconds(1), Filter);
             _subscription
                 .ToObservable()
-                .SimpleSubscribe(rm => { Console.WriteLine("Recieved message: " + rm.Message.Message); });
+                .SimpleSubscribe(rm => { Console.WriteLine("Recieved message: " + rm.Message.Greeting); });
 
             Task.Delay(TimeSpan.FromSeconds(5));
 
             _subscription.Close(TimeSpan.FromSeconds(1));
+        }
+
+        [Test]
+        public void ApiTest()
+        {
+            //            var queueconnection = ObservableConnectionFactory.Create().GetQueue<MyMessage>("MessageExchange", "MessageQueue");
+            //
+            //            Enumerable.Range(0, 100).ToList().ForEach(i => queueconnection.Publish(new MyMessage
+            //            {
+            //                Greeting = string.Format("Hello message: {0}", i)
+            //            }));
+
+            //            queueconnection
+            //                .Listen()
+            //                .ToObservable()
+            //                .ToMessage<MyMessage>();
         }
 
         private IObservable<RabbitMessage> Filter(IObservable<RabbitMessage> stream)
@@ -56,6 +72,6 @@ namespace TravelRepublic.RxRabbitMQClient.Tests
 
     public class MyMessage
     {
-        public string Message { get; set; }
+        public string Greeting { get; set; }
     }
 }
