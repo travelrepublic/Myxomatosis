@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myxomatosis", "Myxomatosis\Myxomatosis.csproj", "{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myxomatosis.Tests", "Myxomatosis.Tests\Myxomatosis.Tests.csproj", "{84A688EF-F510-4771-9D81-9CFD11D69DE9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84A688EF-F510-4771-9D81-9CFD11D69DE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84A688EF-F510-4771-9D81-9CFD11D69DE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84A688EF-F510-4771-9D81-9CFD11D69DE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84A688EF-F510-4771-9D81-9CFD11D69DE9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
