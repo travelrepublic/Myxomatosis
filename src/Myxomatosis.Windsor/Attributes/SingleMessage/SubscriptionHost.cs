@@ -1,9 +1,9 @@
-using System;
 using Castle.Core.Logging;
-using TravelRepublic.RxRabbitMQClient.Connection;
-using TravelRepublic.RxRabbitMQClient.Connection.Message;
+using Myxomatosis.Connection;
+using Myxomatosis.Connection.Message;
+using System;
 
-namespace TravelRepublic.RxRabbitMQClient.Windsor.Attributes
+namespace Myxomatosis.Windsor.Attributes.SingleMessage
 {
     internal class SubscriptionHost<T> : ISubscription
     {

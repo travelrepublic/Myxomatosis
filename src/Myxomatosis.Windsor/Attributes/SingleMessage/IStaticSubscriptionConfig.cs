@@ -1,4 +1,4 @@
-namespace TravelRepublic.RxRabbitMQClient.Windsor.Attributes
+namespace Myxomatosis.Windsor.Attributes.SingleMessage
 {
     public interface IStaticSubscriptionConfig
     {

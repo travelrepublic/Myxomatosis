@@ -1,7 +1,7 @@
+using Myxomatosis.Connection.Message;
 using System;
-using TravelRepublic.RxRabbitMQClient.Connection.Message;
 
-namespace TravelRepublic.RxRabbitMQClient.Windsor.Attributes
+namespace Myxomatosis.Windsor.Attributes.SingleMessage
 {
     public class SubscriptionConverter : IConverter<IStaticSubscriptionConfig, ISubscriptionConfig>
     {

@@ -7,8 +7,8 @@
     <ProjectGuid>{3CCCACD5-B0BF-48DA-9102-91A16BE80152}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TravelRepublic.RxRabbitMQClient.Windsor</RootNamespace>
-    <AssemblyName>TravelRepublic.RxRabbitMQClient.Windsor</AssemblyName>
+    <RootNamespace>Myxomatosis.Windsor</RootNamespace>
+    <AssemblyName>Myxomatosis.Windsor</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -65,9 +65,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TravelRepublic.RxRabbitMQClient\TravelRepublic.RxRabbitMQClient.csproj">
+    <ProjectReference Include="..\Myxomatosis\Myxomatosis.csproj">
       <Project>{6433aaeb-c28e-4039-a4ef-c315ee48a2eb}</Project>
-      <Name>TravelRepublic.RxRabbitMQClient</Name>
+      <Name>Myxomatosis</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

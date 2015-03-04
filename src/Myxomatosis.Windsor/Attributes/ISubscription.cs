@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TravelRepublic.RxRabbitMQClient.Windsor.Attributes
+namespace Myxomatosis.Windsor.Attributes
 {
     public interface ISubscription
     {

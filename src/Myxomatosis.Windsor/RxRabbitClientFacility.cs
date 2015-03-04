@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using Castle.Core;
+﻿using Castle.Core;
 using Castle.Core.Configuration;
 using Castle.Core.Internal;
 using Castle.Core.Logging;
@@ -11,14 +6,22 @@ using Castle.MicroKernel;
 using Castle.MicroKernel.Context;
 using Castle.MicroKernel.Handlers;
 using Castle.MicroKernel.Registration;
-using TravelRepublic.RxRabbitMQClient.Configuration;
-using TravelRepublic.RxRabbitMQClient.Connection;
-using TravelRepublic.RxRabbitMQClient.Connection.Message;
-using TravelRepublic.RxRabbitMQClient.Serialization;
-using TravelRepublic.RxRabbitMQClient.Windsor.Attributes;
-using TravelRepublic.RxRabbitMQClient.Windsor.Helpers;
+using Myxomatosis.Configuration;
+using Myxomatosis.Connection;
+using Myxomatosis.Connection.Message;
+using Myxomatosis.Serialization;
+using Myxomatosis.Windsor.Attributes;
+using Myxomatosis.Windsor.Attributes.MultiMessage;
+using Myxomatosis.Windsor.Attributes.SingleMessage;
+using Myxomatosis.Windsor.Helpers;
+using Myxomatosis.Windsor.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
-namespace TravelRepublic.RxRabbitMQClient.Windsor
+namespace Myxomatosis.Windsor
 {
     public class RxRabbitClientFacility : IFacility
     {
@@ -41,7 +44,7 @@ namespace TravelRepublic.RxRabbitMQClient.Windsor
             _interceptingTypes = new Dictionary<Type, IList<Type>>();
         }
 
-        #endregion
+        #endregion Constructors
 
         #region IFacility Members
 
@@ -78,19 +81,19 @@ namespace TravelRepublic.RxRabbitMQClient.Windsor
         {
         }
 
-        #endregion
+        #endregion IFacility Members
 
         private void ComponentModelCreated(ComponentModel model)
         {
             if (model.ExtendedProperties.Contains(QueueNameKey))
             {
-                var messageType = (Type) model.ExtendedProperties[MessageTypeKey];
-                var isEnumerableMessage = (bool) model.ExtendedProperties[IsEnumerableMessageType];
+                var messageType = (Type)model.ExtendedProperties[MessageTypeKey];
+                var isEnumerableMessage = (bool)model.ExtendedProperties[IsEnumerableMessageType];
 
                 if (isEnumerableMessage)
                 {
-                    var subscriptionHostType = typeof (BatchSubscriptionHost<>).MakeGenericType(messageType);
-                    var configs = (IBatchSubscriptionConfig[]) model.ExtendedProperties[QueueNameKey];
+                    var subscriptionHostType = typeof(BatchSubscriptionHost<>).MakeGenericType(messageType);
+                    var configs = (IBatchSubscriptionConfig[])model.ExtendedProperties[QueueNameKey];
                     foreach (var config in configs)
                     {
                         _kernel.Register(
@@ -103,8 +106,8 @@ namespace TravelRepublic.RxRabbitMQClient.Windsor
                 }
                 else
                 {
-                    var subscriptionHostType = typeof (SubscriptionHost<>).MakeGenericType(messageType);
-                    var configs = (ISubscriptionConfig[]) model.ExtendedProperties[QueueNameKey];
+                    var subscriptionHostType = typeof(SubscriptionHost<>).MakeGenericType(messageType);
+                    var configs = (ISubscriptionConfig[])model.ExtendedProperties[QueueNameKey];
                     foreach (var config in configs)
                     {
                         _kernel.Register(
@@ -130,17 +133,17 @@ namespace TravelRepublic.RxRabbitMQClient.Windsor
 
                     var lambdaProperty = Expression.Parameter(model.Implementation, "entity");
                     var property = Expression.Property(lambdaProperty, propertyInfo);
-                    var func = typeof (Func<,>).MakeGenericType(model.Implementation, propertyInfo.PropertyType);
+                    var func = typeof(Func<,>).MakeGenericType(model.Implementation, propertyInfo.PropertyType);
                     var @delegatelambda = Expression.Lambda(func, property, lambdaProperty);
                     var @delegate = @delegatelambda.Compile();
 
                     var handlerComponentName = "Handler_" + Guid.NewGuid();
 
                     var messageType = propertyInfo.PropertyType.GetGenericArguments()[0];
-                    var handlerType = typeof (IRabbitMessageHandler<>).MakeGenericType(messageType);
+                    var handlerType = typeof(IRabbitMessageHandler<>).MakeGenericType(messageType);
                     var hand = Component.For(handlerType).UsingFactoryMethod(k => @delegate.DynamicInvoke(k.Resolve(model.Implementation))).Named(handlerComponentName);
 
-                    var subscriptionHostType = typeof (SubscriptionHost<>).MakeGenericType(messageType);
+                    var subscriptionHostType = typeof(SubscriptionHost<>).MakeGenericType(messageType);
 
                     var config = rabbitMessageHandlerAttribute.GetConfig();
 
@@ -199,7 +202,7 @@ namespace TravelRepublic.RxRabbitMQClient.Windsor
                 throw new NotImplementedException();
             }
 
-            #endregion
+            #endregion IGenericImplementationMatchingStrategy Members
 
             public bool Supports(Type service, ComponentModel component)
             {
@@ -207,7 +210,7 @@ namespace TravelRepublic.RxRabbitMQClient.Windsor
             }
         }
 
-        #endregion
+        #endregion Nested type: x
     }
 
     public static class RxRabbitClientFacilityExtensions
@@ -216,11 +219,11 @@ namespace TravelRepublic.RxRabbitMQClient.Windsor
             where THandler : class
         {
             var typeValidator = new GenericTypeValidation();
-            var messageType = typeValidator.GetGenericParameter(registration.Implementation, typeof (IRabbitMessageHandler<>));
+            var messageType = typeValidator.GetGenericParameter(registration.Implementation, typeof(IRabbitMessageHandler<>));
 
             registration.ExtendedProperties(Property.ForKey(RxRabbitClientFacility.MessageTypeKey).Eq(messageType));
 
-            if (messageType.IsGenericType && messageType.GetGenericTypeDefinition() == typeof (IEnumerable<>))
+            if (messageType.IsGenericType && messageType.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
                 //Batch messaging
 

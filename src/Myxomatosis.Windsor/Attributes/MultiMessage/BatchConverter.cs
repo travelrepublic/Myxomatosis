@@ -1,7 +1,8 @@
+using Myxomatosis.Connection.Message;
+using Myxomatosis.Windsor.Attributes.SingleMessage;
 using System;
-using TravelRepublic.RxRabbitMQClient.Connection.Message;
 
-namespace TravelRepublic.RxRabbitMQClient.Windsor.Attributes
+namespace Myxomatosis.Windsor.Attributes.MultiMessage
 {
     public class BatchConverter : IConverter<IStaticBatchSubscriptionConfig, IBatchSubscriptionConfig>
     {

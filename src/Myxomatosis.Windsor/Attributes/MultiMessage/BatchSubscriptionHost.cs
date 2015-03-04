@@ -1,10 +1,10 @@
+using Castle.Core.Logging;
+using Myxomatosis.Connection;
+using Myxomatosis.Connection.Message;
 using System;
 using System.Collections.Generic;
-using Castle.Core.Logging;
-using TravelRepublic.RxRabbitMQClient.Connection;
-using TravelRepublic.RxRabbitMQClient.Connection.Message;
 
-namespace TravelRepublic.RxRabbitMQClient.Windsor.Attributes
+namespace Myxomatosis.Windsor.Attributes.MultiMessage
 {
     internal class BatchSubscriptionHost<T> : ISubscription
     {
@@ -24,6 +24,10 @@ namespace TravelRepublic.RxRabbitMQClient.Windsor.Attributes
 
         #endregion Constructors
 
+        #region ISubscription Members
+
         public IDisposable Subscription { get; set; }
+
+        #endregion ISubscription Members
     }
 }

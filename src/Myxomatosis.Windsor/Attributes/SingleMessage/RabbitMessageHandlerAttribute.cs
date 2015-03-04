@@ -1,8 +1,7 @@
+using Myxomatosis.Connection.Message;
 using System;
-using System.Collections.Generic;
-using TravelRepublic.RxRabbitMQClient.Connection.Message;
 
-namespace TravelRepublic.RxRabbitMQClient.Windsor.Attributes
+namespace Myxomatosis.Windsor.Attributes.SingleMessage
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, AllowMultiple = true)]
     public class RabbitMessageHandlerAttribute : Attribute, IStaticSubscriptionConfig, IConfigFactory<ISubscriptionConfig>

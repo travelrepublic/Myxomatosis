@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace TravelRepublic.RxRabbitMQClient.Windsor.Helpers
+namespace Myxomatosis.Windsor.Helpers
 {
     public class GenericTypeValidation
     {

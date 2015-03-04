@@ -1,4 +1,6 @@
-namespace TravelRepublic.RxRabbitMQClient.Windsor.Attributes
+using Myxomatosis.Windsor.Attributes.SingleMessage;
+
+namespace Myxomatosis.Windsor.Attributes.MultiMessage
 {
     public interface IStaticBatchSubscriptionConfig : IStaticSubscriptionConfig
     {

@@ -1,9 +1,9 @@
 ﻿using Castle.Core.Logging;
+using Myxomatosis.Logging;
 using System;
 using System.Text;
-using TravelRepublic.RxRabbitMQClient.Logging;
 
-namespace TravelRepublic.RxRabbitMQClient.Windsor
+namespace Myxomatosis.Windsor.Logging
 {
     internal class CastleCoreLogger : IRabbitMqClientLogger
     {
