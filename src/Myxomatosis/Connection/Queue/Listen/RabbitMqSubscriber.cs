@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
-using Myxomatosis.Connection.Errors;
+﻿using Myxomatosis.Connection.Errors;
 using Myxomatosis.Connection.Message;
 using Myxomatosis.Logging;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System;
+using System.Linq;
 
 namespace Myxomatosis.Connection.Queue.Listen
 {
@@ -14,6 +14,8 @@ namespace Myxomatosis.Connection.Queue.Listen
         private readonly IRabbitMessageErrorHandler _errorHandler;
         private readonly IRabbitMqClientLogger _logger;
 
+        #region Constructors
+
         public RabbitMqSubscriber(ConnectionFactory connectionFactory,
             IRabbitMessageErrorHandler errorHandler,
             IRabbitMqClientLogger logger)
@@ -22,6 +24,10 @@ namespace Myxomatosis.Connection.Queue.Listen
             _errorHandler = errorHandler;
             _logger = logger;
         }
+
+        #endregion Constructors
+
+        #region IRabbitMqSubscriber Members
 
         public void Subscribe(QueueSubscription subscription)
         {
@@ -41,7 +47,7 @@ namespace Myxomatosis.Connection.Queue.Listen
                             var queueName = string.Format("{0}::{1}", subscription.QueueName.Exchange, subscription.QueueName.Queue);
 
                             model.DeclareQueue(queueName);
-                            model.QueueBind(queueName, subscription.QueueName.Exchange, subscription.QueueName.Queue);
+                            model.QueueBind(queueName, subscription.QueueName.Exchange, subscription.QueueName.RoutingKey ?? subscription.QueueName.Queue);
 
                             model.BasicQos(0, 50, false); //TODO: make number of concurrent messages retired configurable
                             model.BasicConsume(queueName, false, consumer);
@@ -52,7 +58,7 @@ namespace Myxomatosis.Connection.Queue.Listen
                             while (subscription.KeepListening)
                             {
                                 BasicDeliverEventArgs basicDeliverEventArgs;
-                                if (!consumer.Queue.Dequeue((int)TimeSpan.FromSeconds(0.1).TotalMilliseconds, out basicDeliverEventArgs))
+                                if (!consumer.Queue.Dequeue((int)TimeSpan.FromSeconds(5).TotalMilliseconds, out basicDeliverEventArgs))
                                     continue;
 
                                 _logger.LogTrace("Dequeued message with delivery tag {0}", basicDeliverEventArgs.DeliveryTag);
@@ -95,5 +101,7 @@ namespace Myxomatosis.Connection.Queue.Listen
                 throw;
             }
         }
+
+        #endregion IRabbitMqSubscriber Members
     }
 }

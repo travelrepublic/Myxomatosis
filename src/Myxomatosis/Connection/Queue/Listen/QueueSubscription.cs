@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Myxomatosis.Connection.Message;
+using System;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
-using Myxomatosis.Connection.Message;
 
 namespace Myxomatosis.Connection.Queue.Listen
 {
@@ -13,11 +13,11 @@ namespace Myxomatosis.Connection.Queue.Listen
 
         #region Constructors
 
-        public QueueSubscription(string exchange, string queue)
+        public QueueSubscription(string exchange, string queue, string routingKey)
         {
             _subject = new ReplaySubject<RabbitMessage>();
 
-            QueueName = new QueueSubscriptionData(exchange, queue);
+            QueueName = new QueueSubscriptionData(exchange, queue, routingKey);
             KeepListening = true;
             OpenEvent = new ManualResetEvent(false);
         }

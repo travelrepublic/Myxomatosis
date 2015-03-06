@@ -1,6 +1,7 @@
 ﻿using Myxomatosis.Connection;
 using Myxomatosis.Connection.Message;
 using Myxomatosis.Connection.Queue;
+using Myxomatosis.Logging;
 using NUnit.Framework;
 using System;
 using System.Linq;
@@ -12,27 +13,44 @@ namespace Myxomatosis.Tests
     [TestFixture]
     internal class IntegrationTests
     {
+        private string _exchange;
+        private string _queue;
+        private string _routingKey;
+
         private IRabbitQueue<MyMessage> _queueConnection;
         private IListeningConnection<MyMessage> _subscription;
 
         [SetUp]
         public void Init()
         {
-            _queueConnection = ObservableConnectionFactory.Create()
-                .GetQueue<MyMessage>("TestExchange", "TestQueue");
+            _exchange = "TestExchange";
+            _queue = "TestQueue";
+            _routingKey = "RouteMe";
 
-            Enumerable.Range(0, 10).ToList().ForEach(i => { _queueConnection.Publish(new MyMessage { Greeting = "Message: " + i }); });
+            var rabbitConnection = ObservableConnectionFactory.Create(f => f.WithLogger(new RabbitMqConsoleLogger()));
+
+            _queueConnection = rabbitConnection.GetQueue<MyMessage>(_exchange, _queue, _routingKey);
+
+            Enumerable.Range(0, 10).ToList().ForEach(i =>
+            {
+                rabbitConnection.GetExchange<MyMessage>(_exchange)
+                    .Publish(new MyMessage { Greeting = "Message: " + i }, _routingKey);
+            });
         }
 
         [Test]
         public void Test()
         {
-            _subscription = _queueConnection.Listen(TimeSpan.FromSeconds(1), Filter);
-            _subscription
-                .ToObservable()
-                .SubscribeWithAck(rm => { Console.WriteLine("Recieved message: " + rm.Message.Greeting); });
+            _subscription = _queueConnection.Listen(TimeSpan.FromSeconds(1));
 
-            Task.Delay(TimeSpan.FromSeconds(5));
+            Task.Factory.StartNew(() =>
+            {
+                _subscription
+                    .ToObservable()
+                    .SubscribeWithAck(rm => { Console.WriteLine("Recieved message: " + rm.Message.Greeting); });
+            });
+
+            Task.Delay(TimeSpan.FromSeconds(5)).Wait();
 
             _subscription.Close(TimeSpan.FromSeconds(1));
         }
@@ -62,5 +80,28 @@ namespace Myxomatosis.Tests
     public class MyMessage
     {
         public string Greeting { get; set; }
+    }
+
+    public class NullLogger : IRabbitMqClientLogger
+    {
+        public void LogTrace(string message, params object[] args)
+        {
+        }
+
+        public void LogInfo(string message, params object[] args)
+        {
+        }
+
+        public void LogWarn(string message, params object[] args)
+        {
+        }
+
+        public void LogError(string message, params object[] args)
+        {
+        }
+
+        public void LogError(string message, Exception exception)
+        {
+        }
     }
 }

@@ -2,12 +2,14 @@
 using Myxomatosis.Connection.Exchange;
 using Myxomatosis.Connection.Queue;
 using Myxomatosis.Connection.Queue.Listen;
+using Myxomatosis.Logging;
 using Myxomatosis.Serialization;
 
 namespace Myxomatosis.Api
 {
     public class Listener : IObservableConnection
     {
+        private readonly IRabbitMqClientLogger _logger;
         private readonly IRabbitPublisher _publisher;
         private readonly ISerializer _serializer;
         private readonly IRabbitMqSubscriber _subscriberThread;
@@ -19,29 +21,55 @@ namespace Myxomatosis.Api
             IRabbitMqSubscriber subscriberThread,
             IRabbitPublisher publisher,
             IQueueSubscriptionManager subscriptionManager,
-            ISerializer serializer)
+            ISerializer serializer,
+            IRabbitMqClientLogger logger)
         {
             _subscriberThread = subscriberThread;
             _publisher = publisher;
             _subscriptionManager = subscriptionManager;
             _serializer = serializer;
+            _logger = logger;
         }
 
         #endregion Constructors
 
+        #region IObservableConnection Members
+
         public IRabbitQueue GetQueue(string exchange, string queueName)
         {
-            return OpenConnectionInternal(exchange, queueName);
+            return OpenConnectionInternal(exchange, queueName, null);
+        }
+
+        public IRabbitQueue GetQueue(string exchange, string queueName, string routingKey)
+        {
+            return OpenConnectionInternal(exchange, queueName, routingKey);
         }
 
         public IRabbitQueue<T> GetQueue<T>(string exchange, string queueName)
         {
-            return new QueueResult<T>(OpenConnectionInternal(exchange, queueName), _serializer);
+            return new QueueResult<T>(OpenConnectionInternal(exchange, queueName, null), _logger);
         }
 
-        private QueueResult OpenConnectionInternal(string exchange, string queueName)
+        public IRabbitQueue<T> GetQueue<T>(string exchange, string queueName, string routingKey)
         {
-            return new QueueResult(exchange, queueName, _subscriptionManager, _publisher, _subscriberThread);
+            return new QueueResult<T>(OpenConnectionInternal(exchange, queueName, routingKey), _logger);
+        }
+
+        public IRabbitExchange GetExchange(string exchange)
+        {
+            return new Exchange(exchange, _publisher, _serializer);
+        }
+
+        public IRabbitExchange<T> GetExchange<T>(string exchange)
+        {
+            return new Exchange<T>(exchange, _publisher, _serializer);
+        }
+
+        #endregion IObservableConnection Members
+
+        private QueueResult OpenConnectionInternal(string exchange, string queueName, string routingKey)
+        {
+            return new QueueResult(exchange, queueName, routingKey, _subscriptionManager, _subscriberThread);
         }
     }
 }

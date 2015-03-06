@@ -4,8 +4,12 @@ namespace Myxomatosis.Connection.Exchange
 {
     public interface IRabbitPublisher
     {
-        void Publish(byte[] payload, string queueName);
+        void Publish(byte[] payload, string exchange);
 
-        void Publish(byte[] payload, string queueName, IDictionary<string, byte[]> headers);
+        void Publish(byte[] payload, string exchange, string routingKey);
+
+        void Publish(byte[] payload, string exchange, IDictionary<string, byte[]> headers);
+
+        void Publish(byte[] payload, string exchange, string routingKey, IDictionary<string, byte[]> dictionary);
     }
 }

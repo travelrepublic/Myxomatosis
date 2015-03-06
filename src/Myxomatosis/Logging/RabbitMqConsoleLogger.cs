@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Myxomatosis.Logging
 {
-    internal class RabbitMqConsoleLogger : IRabbitMqClientLogger
+    public class RabbitMqConsoleLogger : IRabbitMqClientLogger
     {
         #region IRabbitMqClientLogger Members
 

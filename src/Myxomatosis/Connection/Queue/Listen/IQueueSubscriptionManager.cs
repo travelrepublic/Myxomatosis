@@ -2,6 +2,6 @@
 {
     public interface IQueueSubscriptionManager
     {
-        QueueSubscription GetSubscription(string exchange, string queueName);
+        QueueSubscription GetSubscription(string exchange, string queueName, string routingKey);
     }
 }

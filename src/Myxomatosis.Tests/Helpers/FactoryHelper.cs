@@ -1,9 +1,9 @@
-﻿using System;
-using System.Threading.Tasks;
-using Myxomatosis.Api;
+﻿using Myxomatosis.Api;
 using Myxomatosis.Connection;
 using Myxomatosis.Connection.Queue.Listen;
 using Myxomatosis.Serialization;
+using System;
+using System.Threading.Tasks;
 
 namespace Myxomatosis.Tests.Helpers
 {
@@ -35,7 +35,7 @@ namespace Myxomatosis.Tests.Helpers
 
         public IObservableConnection GetListener()
         {
-            return new Listener(_supplierThreadMock, null, new SubscriptionManager(), DefaultSerializer.Instance);
+            return new Listener(_supplierThreadMock, null, new SubscriptionManager(), DefaultSerializer.Instance, new NullLogger());
         }
 
         #region Nested type: MockSubscriberThread

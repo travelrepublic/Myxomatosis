@@ -2,16 +2,23 @@
 {
     public class QueueSubscriptionData
     {
-        public QueueSubscriptionData(string exchange, string queue)
+        #region Constructors
+
+        public QueueSubscriptionData(string exchange, string queue, string routingKey)
         {
             Exchange = exchange;
             Queue = queue;
-            Type = "fanout";
+            RoutingKey = routingKey;
+            Type = "topic";
         }
+
+        #endregion Constructors
 
         public string Exchange { get; private set; }
 
         public string Queue { get; private set; }
+
+        public string RoutingKey { get; set; }
 
         public string Type { get; private set; }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Linq;
 
 namespace Myxomatosis.Connection.Queue.Listen
 {
@@ -17,16 +18,16 @@ namespace Myxomatosis.Connection.Queue.Listen
 
         #region IQueueSubscriptionManager Members
 
-        public QueueSubscription GetSubscription(string exchange, string queueName)
+        public QueueSubscription GetSubscription(string exchange, string queueName, string routingKey)
         {
-            return _subscriptions.GetOrAdd(Concatenate(exchange, queueName), new QueueSubscription(exchange, queueName));
+            return _subscriptions.GetOrAdd(Concatenate(exchange, queueName, routingKey), new QueueSubscription(exchange, queueName, routingKey));
         }
 
         #endregion IQueueSubscriptionManager Members
 
         private string Concatenate(params string[] keys)
         {
-            return string.Join("::", keys);
+            return string.Join("::", keys.Select(k => k ?? string.Empty));
         }
     }
 }

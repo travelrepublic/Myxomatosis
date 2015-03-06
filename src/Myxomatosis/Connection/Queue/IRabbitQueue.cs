@@ -1,6 +1,6 @@
+using Myxomatosis.Connection.Message;
 using System;
 using System.Collections.Generic;
-using Myxomatosis.Connection.Message;
 
 namespace Myxomatosis.Connection.Queue
 {
@@ -13,10 +13,6 @@ namespace Myxomatosis.Connection.Queue
         IListeningConnection<T> Listen(TimeSpan openTimeout);
 
         IListeningConnection<T> Listen(TimeSpan openTimeout, StreamTransform transform);
-
-        void Publish(T message);
-
-        void Publish(T message, IDictionary<string, object> headers);
     }
 
     public interface IRabbitQueue
@@ -26,7 +22,19 @@ namespace Myxomatosis.Connection.Queue
         IListeningConnection Listen(TimeSpan openTimeout);
 
         IListeningConnection Listen(TimeSpan openTimeout, StreamTransform transform);
+    }
 
-        void Publish(byte[] payload);
+    public interface IRabbitExchange
+    {
+        void Publish(byte[] payload, string routingKey);
+
+        void Publish(byte[] payload, string routingKey, IDictionary<string, object> headers);
+    }
+
+    public interface IRabbitExchange<T>
+    {
+        void Publish(T message, string routingKey);
+
+        void Publish(T message, string routingKey, IDictionary<string, object> headers);
     }
 }

@@ -1,10 +1,11 @@
+using Myxomatosis.Connection;
+using Myxomatosis.Connection.Message;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using Myxomatosis.Connection;
-using Myxomatosis.Connection.Message;
+using System.Threading;
 
 namespace Myxomatosis
 {
@@ -26,6 +27,9 @@ namespace Myxomatosis
                     rm.Acknowledge();
                     throw;
                 }
+            }, e =>
+            {
+                string mes = e.Message;
             });
         }
 

@@ -1,26 +1,26 @@
-using System;
-using System.Reactive.Linq;
 using Myxomatosis.Connection;
 using Myxomatosis.Connection.Message;
 using Myxomatosis.Connection.Queue;
 using Myxomatosis.Connection.Queue.Listen;
-using Myxomatosis.Serialization;
+using Myxomatosis.Logging;
+using System;
+using System.Reactive.Linq;
 
 namespace Myxomatosis.Api
 {
     internal class ListeningConnection<T> : IListeningConnection<T>
     {
         private readonly IListeningConnection _listeningConnection;
-        private readonly ISerializer _serializer;
+        private readonly IRabbitMqClientLogger _logger;
 
         #region Constructors
 
         public ListeningConnection(
             IListeningConnection listeningConnection,
-            ISerializer serializer)
+            IRabbitMqClientLogger logger)
         {
             _listeningConnection = listeningConnection;
-            _serializer = serializer;
+            _logger = logger;
         }
 
         #endregion Constructors
@@ -44,7 +44,9 @@ namespace Myxomatosis.Api
 
         public IObservable<RabbitMessage<T>> ToObservable()
         {
-            return _listeningConnection.ToObservable().ToMessage<T>();
+            var stream = _listeningConnection.ToObservable().ToMessage<T>();
+            stream.Subscribe(m => { }, e => { _logger.LogError("Myxomatosis exception: ", e); });
+            return stream;
         }
 
         #endregion IListeningConnection<T> Members
@@ -73,7 +75,8 @@ namespace Myxomatosis.Api
             /**
              * When the subscriber is disposed we want to dispose of the underlying connection
              * */
-            return Observable.Using(() => new ConnectionDisposer(this), cd => cd.MessageStream);
+            var stream = Observable.Using(() => new ConnectionDisposer(this), cd => cd.MessageStream);
+            return stream;
         }
 
         #endregion IListeningConnection Members
@@ -94,7 +97,7 @@ namespace Myxomatosis.Api
 
             #endregion Constructors
 
-            public IObservable<RabbitMessage> MessageStream { get; set; }
+            public IObservable<RabbitMessage> MessageStream { get; private set; }
 
             #region IDisposable Members
 
