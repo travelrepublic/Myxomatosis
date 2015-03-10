@@ -40,9 +40,19 @@ namespace Myxomatosis.Api
             return OpenConnectionInternal(exchange, queueName, null);
         }
 
+        public IRabbitQueue GetQueue(string exchange, string queueName, ExchangeType exchangeType)
+        {
+            return OpenConnectionInternal(exchange, queueName, null, exchangeType);
+        }
+
         public IRabbitQueue GetQueue(string exchange, string queueName, string routingKey)
         {
             return OpenConnectionInternal(exchange, queueName, routingKey);
+        }
+
+        public IRabbitQueue GetQueue(string exchange, string queueName, string routingKey, ExchangeType exchangeType)
+        {
+            return OpenConnectionInternal(exchange, queueName, routingKey, exchangeType);
         }
 
         public IRabbitQueue<T> GetQueue<T>(string exchange, string queueName)
@@ -50,26 +60,46 @@ namespace Myxomatosis.Api
             return new QueueResult<T>(OpenConnectionInternal(exchange, queueName, null), _logger);
         }
 
+        public IRabbitQueue<T> GetQueue<T>(string exchange, string queueName, ExchangeType exchangeType)
+        {
+            return new QueueResult<T>(OpenConnectionInternal(exchange, queueName, null, exchangeType), _logger);
+        }
+
         public IRabbitQueue<T> GetQueue<T>(string exchange, string queueName, string routingKey)
         {
             return new QueueResult<T>(OpenConnectionInternal(exchange, queueName, routingKey), _logger);
         }
 
+        public IRabbitQueue<T> GetQueue<T>(string exchange, string queueName, string routingKey, ExchangeType exchangeType)
+        {
+            return new QueueResult<T>(OpenConnectionInternal(exchange, queueName, routingKey, exchangeType), _logger);
+        }
+
         public IRabbitExchange GetExchange(string exchange)
         {
-            return new Exchange(exchange, _publisher, _serializer);
+            return GetExchange(exchange, ExchangeType.Topic);
         }
 
         public IRabbitExchange<T> GetExchange<T>(string exchange)
         {
-            return new Exchange<T>(exchange, _publisher, _serializer);
+            return GetExchange<T>(exchange, ExchangeType.Topic);
+        }
+
+        public IRabbitExchange GetExchange(string exchange, ExchangeType exchangeType)
+        {
+            return new Exchange(exchange, _publisher, _serializer, exchangeType);
+        }
+
+        public IRabbitExchange<T> GetExchange<T>(string exchange, ExchangeType exchangeType)
+        {
+            return new Exchange<T>(exchange, _publisher, _serializer, exchangeType);
         }
 
         #endregion IObservableConnection Members
 
-        private QueueResult OpenConnectionInternal(string exchange, string queueName, string routingKey)
+        private QueueResult OpenConnectionInternal(string exchange, string queueName, string routingKey, ExchangeType exchangeType = ExchangeType.Topic)
         {
-            return new QueueResult(exchange, queueName, routingKey, _subscriptionManager, _subscriberThread);
+            return new QueueResult(exchange, queueName, routingKey, _subscriptionManager, _subscriberThread, exchangeType);
         }
     }
 }

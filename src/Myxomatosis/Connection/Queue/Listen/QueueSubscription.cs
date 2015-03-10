@@ -13,11 +13,14 @@ namespace Myxomatosis.Connection.Queue.Listen
 
         #region Constructors
 
-        public QueueSubscription(string exchange, string queue, string routingKey)
+        public QueueSubscription(string exchange, string queue, string routingKey, ExchangeType exchangeType)
         {
             _subject = new ReplaySubject<RabbitMessage>();
 
-            SubscriptionData = new QueueSubscriptionData(exchange, queue, routingKey);
+            SubscriptionData = new QueueSubscriptionData(exchange, queue, routingKey)
+            {
+                Type = exchangeType
+            };
             KeepListening = true;
             OpenEvent = new ManualResetEvent(false);
         }

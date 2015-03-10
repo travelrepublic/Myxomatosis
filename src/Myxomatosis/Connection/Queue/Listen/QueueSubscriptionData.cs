@@ -9,7 +9,7 @@
             Exchange = exchange;
             Queue = queue;
             RoutingKey = routingKey;
-            Type = "topic";
+            Type = ExchangeType.Topic;
             PrefetchCount = 50;
         }
 
@@ -21,7 +21,7 @@
 
         public string RoutingKey { get; set; }
 
-        public string Type { get; private set; }
+        public ExchangeType Type { get; set; }
 
         public int PrefetchCount { get; set; }
     }

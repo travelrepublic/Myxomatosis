@@ -14,22 +14,22 @@ namespace Myxomatosis.Connection.Queue.Listen
             _subscriptions = new ConcurrentDictionary<string, QueueSubscription>();
         }
 
-        public int PrefetchCount { get; set; }
+        #endregion
 
-        #endregion Constructors
+        public int PrefetchCount { get; set; }
 
         #region IQueueSubscriptionManager Members
 
-        public QueueSubscription GetSubscription(string exchange, string queueName, string routingKey)
+        public QueueSubscription GetSubscription(string exchange, string queueName, string routingKey, ExchangeType exchangeType)
         {
             return _subscriptions.GetOrAdd(Concatenate(exchange, queueName, routingKey),
-                new QueueSubscription(exchange, queueName, routingKey)
+                new QueueSubscription(exchange, queueName, routingKey, exchangeType)
                 {
                     PrefetchCount = PrefetchCount
                 });
         }
 
-        #endregion IQueueSubscriptionManager Members
+        #endregion
 
         private string Concatenate(params string[] keys)
         {

@@ -14,16 +14,18 @@ namespace Myxomatosis.Api
     public class Exchange : IRabbitExchange
     {
         private readonly string _exchange;
+        private readonly ExchangeType _exchangeType;
         private readonly IRabbitPublisher _publisher;
         protected readonly ISerializer _serializer;
 
         #region Constructors
 
-        public Exchange(string exchange, IRabbitPublisher publisher, ISerializer serializer)
+        public Exchange(string exchange, IRabbitPublisher publisher, ISerializer serializer, ExchangeType exchangeType)
         {
             _exchange = exchange;
             _publisher = publisher;
             _serializer = serializer;
+            _exchangeType = exchangeType;
         }
 
         #endregion Constructors
@@ -44,7 +46,7 @@ namespace Myxomatosis.Api
 
         private void PublishInternal(byte[] payload, string routingKey, IDictionary<string, byte[]> headers)
         {
-            _publisher.Publish(payload, _exchange, routingKey, headers);
+            _publisher.Publish(payload, _exchange, routingKey, headers, _exchangeType);
         }
     }
 
@@ -52,8 +54,8 @@ namespace Myxomatosis.Api
     {
         #region Constructors
 
-        public Exchange(string exchange, IRabbitPublisher publisher, ISerializer serializer)
-            : base(exchange, publisher, serializer)
+        public Exchange(string exchange, IRabbitPublisher publisher, ISerializer serializer, ExchangeType exchangeType)
+            : base(exchange, publisher, serializer, exchangeType)
         {
         }
 
@@ -112,6 +114,7 @@ namespace Myxomatosis.Api
     public class QueueResult : IRabbitQueue
     {
         private readonly string _exchange;
+        private readonly ExchangeType _exchangeType;
         private readonly object _listenPadlock;
         private readonly string _queueName;
         private readonly IQueueSubscriptionManager _queueSubscriptionManager;
@@ -120,13 +123,14 @@ namespace Myxomatosis.Api
 
         #region Constructors
 
-        public QueueResult(string exchange, string queueName, string routingKey, IQueueSubscriptionManager subscription, IRabbitMqSubscriber subscriberThread)
+        public QueueResult(string exchange, string queueName, string routingKey, IQueueSubscriptionManager subscription, IRabbitMqSubscriber subscriberThread, ExchangeType exchangeType)
         {
             _exchange = exchange;
             _queueName = queueName;
             _routingKey = routingKey;
             _queueSubscriptionManager = subscription;
             _subscriberThread = subscriberThread;
+            _exchangeType = exchangeType;
             _listenPadlock = new object();
         }
 
@@ -153,7 +157,7 @@ namespace Myxomatosis.Api
 
         private IListeningConnection ListenInternal(TimeSpan openTimeout, StreamTransform transform)
         {
-            var queueSubscription = _queueSubscriptionManager.GetSubscription(_exchange, _queueName, _routingKey);
+            var queueSubscription = _queueSubscriptionManager.GetSubscription(_exchange, _queueName, _routingKey, _exchangeType);
 
             lock (_listenPadlock)
             {

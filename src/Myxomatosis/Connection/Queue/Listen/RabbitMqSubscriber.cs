@@ -42,8 +42,7 @@ namespace Myxomatosis.Connection.Queue.Listen
                             var consumer = new QueueingBasicConsumer(model);
                             model.ConfirmSelect(); //try publisher confirms
 
-                            model.DeclareExchange(subscription.SubscriptionData.Exchange, subscription.SubscriptionData.Type);
-
+                            model.DeclareExchange(subscription.SubscriptionData.Exchange, subscription.SubscriptionData.Type.ToRabbitExchange());
                             var queueName = string.Format("{0}::{1}", subscription.SubscriptionData.Exchange, subscription.SubscriptionData.Queue);
 
                             model.DeclareQueue(queueName);

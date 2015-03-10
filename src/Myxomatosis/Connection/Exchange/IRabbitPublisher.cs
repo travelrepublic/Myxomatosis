@@ -11,5 +11,7 @@ namespace Myxomatosis.Connection.Exchange
         void Publish(byte[] payload, string exchange, IDictionary<string, byte[]> headers);
 
         void Publish(byte[] payload, string exchange, string routingKey, IDictionary<string, byte[]> dictionary);
+
+        void Publish(byte[] payload, string exchange, string routingKey, IDictionary<string, byte[]> dictionary, ExchangeType exchangeType);
     }
 }

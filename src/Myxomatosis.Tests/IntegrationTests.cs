@@ -29,11 +29,11 @@ namespace Myxomatosis.Tests
 
             var rabbitConnection = ObservableConnectionFactory.Create(f => f.WithLogger(new RabbitMqConsoleLogger()));
 
-            _queueConnection = rabbitConnection.GetQueue<MyMessage>(_exchange, _queue, _routingKey);
+            _queueConnection = rabbitConnection.GetQueue<MyMessage>(_exchange, _queue, _routingKey, ExchangeType.Fanout);
 
             Enumerable.Range(0, 10).ToList().ForEach(i =>
             {
-                rabbitConnection.GetExchange<MyMessage>(_exchange)
+                rabbitConnection.GetExchange<MyMessage>(_exchange, ExchangeType.Fanout)
                     .Publish(new MyMessage { Greeting = "Message: " + i }, _routingKey);
             });
         }
