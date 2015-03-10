@@ -17,14 +17,19 @@ namespace Myxomatosis.Connection.Queue.Listen
         {
             _subject = new ReplaySubject<RabbitMessage>();
 
-            QueueName = new QueueSubscriptionData(exchange, queue, routingKey);
+            SubscriptionData = new QueueSubscriptionData(exchange, queue, routingKey);
             KeepListening = true;
             OpenEvent = new ManualResetEvent(false);
         }
 
         #endregion Constructors
 
-        public QueueSubscriptionData QueueName { get; private set; }
+        public int PrefetchCount
+        {
+            set { SubscriptionData.PrefetchCount = value; }
+        }
+
+        public QueueSubscriptionData SubscriptionData { get; private set; }
 
         public IObservable<RabbitMessage> MessageSource
         {

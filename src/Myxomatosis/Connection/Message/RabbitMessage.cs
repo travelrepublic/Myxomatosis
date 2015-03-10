@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Myxomatosis.Connection.Errors;
+﻿using Myxomatosis.Connection.Errors;
 using RabbitMQ.Client;
+using System;
+using System.Collections.Generic;
 
 namespace Myxomatosis.Connection.Message
 {
@@ -45,11 +45,11 @@ namespace Myxomatosis.Connection.Message
             ErrorHandler.Error(this, exception);
         }
 
-        #endregion IRabbitMessageModel Members
-
         public void Reject()
         {
             Channel.BasicNack(DeliveryTag, false, true);
         }
+
+        #endregion IRabbitMessageModel Members
     }
 }

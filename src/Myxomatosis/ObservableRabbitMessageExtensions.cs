@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Threading;
 
 namespace Myxomatosis
 {
@@ -27,10 +26,7 @@ namespace Myxomatosis
                     rm.Acknowledge();
                     throw;
                 }
-            }, e =>
-            {
-                string mes = e.Message;
-            });
+            }, e => { var mes = e.Message; });
         }
 
         public static IDisposable SubscribeWithAck<T>(this IObservable<T> source, Action<T> action)
@@ -124,6 +120,14 @@ namespace Myxomatosis
                 foreach (var rabbitMessageModel in _messageModels)
                 {
                     rabbitMessageModel.Error(exception);
+                }
+            }
+
+            public void Reject()
+            {
+                foreach (var rabbitMessageModel in _messageModels)
+                {
+                    rabbitMessageModel.Reject();
                 }
             }
 

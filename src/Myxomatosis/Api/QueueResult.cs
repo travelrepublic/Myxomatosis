@@ -164,7 +164,7 @@ namespace Myxomatosis.Api
 
             var opened = queueSubscription.OpenEvent.WaitOne(openTimeout);
             if (opened) return new ListeningConnection(queueSubscription, transform);
-            throw new Exception(string.Format("Could not open listening channel within {0} to {1}", openTimeout, queueSubscription.QueueName));
+            throw new Exception(string.Format("Could not open listening channel within {0} to {1}", openTimeout, queueSubscription.SubscriptionData));
         }
     }
 }

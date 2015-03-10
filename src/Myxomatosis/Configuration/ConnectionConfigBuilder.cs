@@ -54,6 +54,12 @@ namespace Myxomatosis.Configuration
             return this;
         }
 
+        public IConnectionConfigBuilder WithPrefetchCount(int prefetchCount)
+        {
+            _configuration.PrefetchCount = prefetchCount;
+            return this;
+        }
+
         #endregion IConnectionConfigBuilder Members
 
         public IConnectionConfig Create()

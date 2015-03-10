@@ -9,5 +9,7 @@ namespace Myxomatosis.Connection.Message
         void Error();
 
         void Error(Exception exception);
+
+        void Reject();
     }
 }

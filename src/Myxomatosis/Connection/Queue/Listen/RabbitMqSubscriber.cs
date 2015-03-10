@@ -42,12 +42,12 @@ namespace Myxomatosis.Connection.Queue.Listen
                             var consumer = new QueueingBasicConsumer(model);
                             model.ConfirmSelect(); //try publisher confirms
 
-                            model.DeclareExchange(subscription.QueueName.Exchange, subscription.QueueName.Type);
+                            model.DeclareExchange(subscription.SubscriptionData.Exchange, subscription.SubscriptionData.Type);
 
-                            var queueName = string.Format("{0}::{1}", subscription.QueueName.Exchange, subscription.QueueName.Queue);
+                            var queueName = string.Format("{0}::{1}", subscription.SubscriptionData.Exchange, subscription.SubscriptionData.Queue);
 
                             model.DeclareQueue(queueName);
-                            model.QueueBind(queueName, subscription.QueueName.Exchange, subscription.QueueName.RoutingKey ?? subscription.QueueName.Queue);
+                            model.QueueBind(queueName, subscription.SubscriptionData.Exchange, subscription.SubscriptionData.RoutingKey ?? subscription.SubscriptionData.Queue);
 
                             model.BasicQos(0, 50, false); //TODO: make number of concurrent messages retired configurable
                             model.BasicConsume(queueName, false, consumer);

@@ -10,6 +10,7 @@
             Queue = queue;
             RoutingKey = routingKey;
             Type = "topic";
+            PrefetchCount = 50;
         }
 
         #endregion Constructors
@@ -21,5 +22,7 @@
         public string RoutingKey { get; set; }
 
         public string Type { get; private set; }
+
+        public int PrefetchCount { get; set; }
     }
 }

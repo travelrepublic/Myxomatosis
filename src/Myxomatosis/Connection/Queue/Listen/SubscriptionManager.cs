@@ -14,13 +14,19 @@ namespace Myxomatosis.Connection.Queue.Listen
             _subscriptions = new ConcurrentDictionary<string, QueueSubscription>();
         }
 
+        public int PrefetchCount { get; set; }
+
         #endregion Constructors
 
         #region IQueueSubscriptionManager Members
 
         public QueueSubscription GetSubscription(string exchange, string queueName, string routingKey)
         {
-            return _subscriptions.GetOrAdd(Concatenate(exchange, queueName, routingKey), new QueueSubscription(exchange, queueName, routingKey));
+            return _subscriptions.GetOrAdd(Concatenate(exchange, queueName, routingKey),
+                new QueueSubscription(exchange, queueName, routingKey)
+                {
+                    PrefetchCount = PrefetchCount
+                });
         }
 
         #endregion IQueueSubscriptionManager Members

@@ -16,5 +16,7 @@ namespace Myxomatosis.Configuration
         IConnectionConfigBuilder UsingSerializer(ISerializer serializer);
 
         IConnectionConfigBuilder WithLogger(IRabbitMqClientLogger logger);
+
+        IConnectionConfigBuilder WithPrefetchCount(int prefetchCount);
     }
 }

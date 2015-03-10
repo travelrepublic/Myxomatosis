@@ -33,6 +33,8 @@ namespace Myxomatosis.Configuration
 
         public IRabbitMqClientLogger Logger { get; internal set; }
 
+        public int PrefetchCount { get; internal set; }
+
         #endregion IConnectionConfig Members
     }
 }
