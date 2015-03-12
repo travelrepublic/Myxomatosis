@@ -35,7 +35,7 @@ namespace Myxomatosis.Tests.Helpers
 
         public IObservableConnection GetListener()
         {
-            return new Listener(_supplierThreadMock, null, new SubscriptionManager(), DefaultSerializer.Instance, new NullLogger());
+            return new ConnectionEntryPoint(null, _supplierThreadMock);
         }
 
         #region Nested type: MockSubscriberThread
@@ -58,15 +58,22 @@ namespace Myxomatosis.Tests.Helpers
 
             #region IRabbitMqSubscriber Members
 
-            public void Subscribe(QueueSubscription subscription)
+            public Task<object> SubscribeAsync(QueueSubscription subscription)
             {
-                Task.Delay(OpenTimeout).Wait();
-                subscription.OpenEvent.Set();
-
-                while (subscription.KeepListening)
+                var taskCompletionSource = new TaskCompletionSource<object>();
+                Task.Run(() =>
                 {
-                    Task.Delay(ProcessingInterval).Wait();
-                }
+                    Task.Delay(OpenTimeout).Wait();
+                    subscription.OpenEvent.Set();
+
+                    while (subscription.KeepListening)
+                    {
+                        Task.Delay(ProcessingInterval).Wait();
+                    }
+
+                    taskCompletionSource.SetResult(null);
+                });
+                return taskCompletionSource.Task;
             }
 
             #endregion IRabbitMqSubscriber Members

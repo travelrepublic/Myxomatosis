@@ -58,7 +58,6 @@
     <Compile Include="Api\Listener.cs" />
     <Compile Include="Api\ListeningConnection.cs" />
     <Compile Include="Api\OpenConnection.cs" />
-    <Compile Include="Api\QueueResult.cs" />
     <Compile Include="Connection\Errors\ErrorMessage.cs" />
     <Compile Include="Connection\Errors\ExceptionDetails.cs" />
     <Compile Include="Connection\Errors\MessageDetails.cs" />
@@ -66,12 +65,10 @@
     <Compile Include="Connection\Exchange\IRabbitPublisher.cs" />
     <Compile Include="Connection\Exchange\RabbitMqPublisher.cs" />
     <Compile Include="Connection\Message\Class1.cs" />
-    <Compile Include="Connection\Queue\Listen\IQueueSubscriptionManager.cs" />
     <Compile Include="Connection\Queue\Listen\QueueSubscription.cs" />
     <Compile Include="Connection\Queue\Listen\IRabbitMqSubscriber.cs" />
     <Compile Include="Connection\Queue\Listen\QueueSubscriptionData.cs" />
     <Compile Include="Connection\Queue\Listen\RabbitMqSubscriber.cs" />
-    <Compile Include="Connection\Queue\Listen\SubscriptionManager.cs" />
     <Compile Include="Connection\RabbitMqClientExtenstions.cs" />
     <Compile Include="Logging\IRabbitMqClientLogger.cs" />
     <Compile Include="Logging\RabbitMqConsoleLogger.cs" />

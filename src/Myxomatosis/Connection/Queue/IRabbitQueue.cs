@@ -24,17 +24,22 @@ namespace Myxomatosis.Connection.Queue
         IListeningConnection Listen(TimeSpan openTimeout, StreamTransform transform);
     }
 
-    public interface IRabbitExchange
+    public interface IExchange
     {
-        void Publish(byte[] payload, string routingKey);
+        void Publish(byte[] message);
 
-        void Publish(byte[] payload, string routingKey, IDictionary<string, object> headers);
-    }
+        void Publish(byte[] message, string routingKey);
 
-    public interface IRabbitExchange<T>
-    {
-        void Publish(T message, string routingKey);
+        void Publish(byte[] message, IDictionary<string, byte[]> headers);
 
-        void Publish(T message, string routingKey, IDictionary<string, object> headers);
+        void Publish(byte[] message, IDictionary<string, byte[]> headers, string routingKey);
+
+        void Publish<T>(T message);
+
+        void Publish<T>(T message, string routingKey);
+
+        void Publish<T>(T message, IDictionary<string, object> headers);
+
+        void Publish<T>(T message, IDictionary<string, object> headers, string routingKey);
     }
 }

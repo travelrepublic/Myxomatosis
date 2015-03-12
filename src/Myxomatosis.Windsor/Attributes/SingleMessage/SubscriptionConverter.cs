@@ -9,7 +9,7 @@ namespace Myxomatosis.Windsor.Attributes.SingleMessage
 
         public ISubscriptionConfig Convert(IStaticSubscriptionConfig source)
         {
-            return new DefaultSubscriptionConfig(source.Exchange, source.QueueName)
+            return new DefaultSubscriptionConfig(source.QueueName)
             {
                 CloseTimeout = TimeSpan.FromMilliseconds(source.CloseTimeout),
                 OpenTimeout = TimeSpan.FromMilliseconds(source.OpenTimeout),

@@ -42,30 +42,34 @@ namespace Myxomatosis
 
         public static IDisposable SubscribeOnQueueToMessage<T>(this IObservableConnection connection, string exchange, string subscriberQueue, IRabbitMessageHandler<T> handler)
         {
-            return connection.SubscribeOnQueueToMessage(new DefaultSubscriptionConfig(exchange, subscriberQueue), handler);
+            return connection.SubscribeOnQueueToMessage(new DefaultSubscriptionConfig(subscriberQueue), handler);
         }
 
         public static IDisposable SubscribeOnQueueToMessage<T>(this IObservableConnection connection, ISubscriptionConfig config, IRabbitMessageHandler<T> handler)
         {
-            return connection.GetQueue<T>(config.Exchange, config.QueueName)
-                .Listen(config.OpenTimeout)
-                .ToObservable()
-                .Pace(config.Interval).SubscribeWithAck(rm => { handler.Handle(rm.Message); });
+            return null;
+            //            return connection.Queue(config)
+            //                .Listen()
+            //                .Open()
+            //                .Stream<T>()
+            //                .Pace(config.Interval).SubscribeWithAck(rm => { handler.Handle(rm.Message); });
         }
 
         public static IDisposable SubscribeOnQueueToMessage<T>(this IObservableConnection connection, IBatchSubscriptionConfig config, IRabbitMessageHandler<IEnumerable<T>> handler)
         {
-            return SubscribeWithAck(connection.GetQueue<T>(config.Exchange, config.QueueName)
-                .Listen(config.OpenTimeout)
-                .ToObservable()
-                .Buffer(config.BufferTimeout, config.BufferSize)
-                .Pace(config.Interval)
-                .Where(m => m.Any())
-                .Select(l => l.AsEnumerable()), l =>
-                {
-                    var rabbitMessages = l.ToArray();
-                    handler.Handle(rabbitMessages.Select(m => m.Message));
-                });
+            return null;
+            //            return SubscribeWithAck(connection.Queue(config.QueueName)
+            //                .Listen()
+            //                .Open()
+            //                .Stream<T>()
+            //                .Buffer(config.BufferTimeout, config.BufferSize)
+            //                .Pace(config.Interval)
+            //                .Where(m => m.Any())
+            //                .Select(l => l.AsEnumerable()), l =>
+            //                {
+            //                    var rabbitMessages = l.ToArray();
+            //                    handler.Handle(rabbitMessages.Select(m => m.Message));
+            //                });
         }
 
         #region Nested type: AggregateRabbitMessage

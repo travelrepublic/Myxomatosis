@@ -1,5 +1,7 @@
 ﻿using Myxomatosis.Connection.Message;
 using System;
+using System.Collections.Concurrent;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -9,25 +11,27 @@ namespace Myxomatosis.Connection.Queue.Listen
 {
     public class QueueSubscription : IDisposable
     {
+        private static readonly ConcurrentDictionary<string, QueueSubscription> _subscriptions;
         private readonly ReplaySubject<RabbitMessage> _subject;
 
         #region Constructors
 
-        public QueueSubscription(string exchange, string queue, string routingKey, ExchangeType exchangeType)
+        static QueueSubscription()
+        {
+            _subscriptions = new ConcurrentDictionary<string, QueueSubscription>();
+        }
+
+        private QueueSubscription(string queue)
         {
             _subject = new ReplaySubject<RabbitMessage>();
-
-            SubscriptionData = new QueueSubscriptionData(exchange, queue, routingKey)
-            {
-                Type = exchangeType
-            };
+            SubscriptionData = new QueueSubscriptionData(queue);
             KeepListening = true;
             OpenEvent = new ManualResetEvent(false);
         }
 
         #endregion Constructors
 
-        public int PrefetchCount
+        public ushort PrefetchCount
         {
             set { SubscriptionData.PrefetchCount = value; }
         }
@@ -41,7 +45,7 @@ namespace Myxomatosis.Connection.Queue.Listen
 
         public IObserver<RabbitMessage> MessageObserver
         {
-            get { return _subject; }
+            get { return _subject.AsObserver(); }
         }
 
         public Task ConsumingTask { get; internal set; }
@@ -64,5 +68,16 @@ namespace Myxomatosis.Connection.Queue.Listen
         }
 
         #endregion IDisposable Members
+
+        public static QueueSubscription Create(string queueName, ushort prefetchCount = 50)
+        {
+            return _subscriptions.GetOrAdd(queueName, q => new QueueSubscription(q) {PrefetchCount = prefetchCount});
+        }
+
+        public static void Remove(string queueName)
+        {
+            QueueSubscription removedItem;
+            _subscriptions.TryRemove(queueName, out removedItem);
+        }
     }
 }

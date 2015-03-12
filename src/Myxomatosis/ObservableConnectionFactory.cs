@@ -38,11 +38,7 @@ namespace Myxomatosis
             var errorHandler = new UnhandledErrorHandler(errorPublisher, config.Serializer);
             var logger = config.Logger;
             var subscriber = new RabbitMqSubscriber(connectionFactory, errorHandler, logger);
-            var subscriptionManager = new SubscriptionManager()
-            {
-                PrefetchCount = config.PrefetchCount
-            };
-            var listener = new Listener(subscriber, publisher, subscriptionManager, config.Serializer, logger);
+            var listener = new ConnectionEntryPoint(connectionFactory, subscriber);
             return listener;
         }
     }

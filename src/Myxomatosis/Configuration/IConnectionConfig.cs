@@ -17,6 +17,6 @@ namespace Myxomatosis.Configuration
 
         IRabbitMqClientLogger Logger { get; }
 
-        int PrefetchCount { get; }
+        ushort PrefetchCount { get; }
     }
 }

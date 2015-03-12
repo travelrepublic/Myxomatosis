@@ -22,9 +22,9 @@ namespace Myxomatosis.Tests
         {
             var subscription = _factoryHelper
                 .GetListener()
-                .GetQueue(Exchange, QueueName)
-                .Listen(TimeSpan.FromSeconds(10))
-                .ToObservable()
+                .Queue(QueueName)
+                .Open(c => c.OpenTimeout(TimeSpan.FromSeconds(10)))
+                .Stream()
                 .SubscribeWithAck(m => { });
 
             Assert.IsNotNull(subscription);

@@ -1,7 +1,8 @@
-using System;
-using System.Threading.Tasks;
+using Myxomatosis.Connection;
 using Myxomatosis.Tests.Helpers;
 using NUnit.Framework;
+using System;
+using System.Threading.Tasks;
 
 namespace Myxomatosis.Tests
 {
@@ -21,111 +22,95 @@ namespace Myxomatosis.Tests
         [Test]
         public void OpenConnectionClosesSuccessfully()
         {
-            var closeResult = _factoryHelper
-                .GetListener()
-                .GetQueue(Exchange, QueueName)
-                .Listen()
-                .Close();
+            IQueueConnection connection;
 
-            Assert.IsTrue(closeResult.Successful);
+            using (connection = _factoryHelper
+                .GetListener()
+                .Queue(QueueName)
+                .Open())
+            {
+                Assert.IsTrue(connection.IsOpen);
+            }
+
+            Assert.IsFalse(connection.IsOpen);
         }
 
         [Test]
         public void OpenConnectionTakesTooLongToClose()
         {
-            var closeResult = _factoryHelper
+            IQueueConnection closeResult;
+
+            using (closeResult = _factoryHelper
                 .SetProcessDuration(TimeSpan.FromSeconds(3))
                 .GetListener()
-                .GetQueue(Exchange, QueueName)
-                .Listen()
-                .Close(TimeSpan.FromSeconds(1));
+                .Queue(QueueName)
+                .Open(c => c.CloseTimeout(TimeSpan.FromSeconds(1)))) ;
 
-            Assert.IsFalse(closeResult.Successful);
+            Assert.IsTrue(closeResult.IsOpen);
         }
 
         [Test]
         public void SubscribeToOpenConnection()
         {
-            var subscription = _factoryHelper
+            IDisposable subscription;
+
+            using (subscription = _factoryHelper
                 .GetListener()
-                .GetQueue(Exchange, QueueName)
-                .Listen(TimeSpan.FromSeconds(10))
-                .ToObservable()
-                .Subscribe(m => { });
+                .Queue(QueueName)
+                .Open(c => c.CloseTimeout(TimeSpan.FromSeconds(10)))
+                .Stream()
+                .Subscribe(m => { })) ;
 
             Assert.IsNotNull(subscription);
         }
 
         [Test]
-        [ExpectedException(typeof (Exception))]
-        public void SubscribeToUnOpenedConnectionThrowsException()
-        {
-            _factoryHelper
-                .SetOpenDuration(TimeSpan.FromSeconds(3))
-                .GetListener()
-                .GetQueue(Exchange, QueueName)
-                .Listen(TimeSpan.FromSeconds(1))
-                .ToObservable()
-                .Subscribe(m => { });
-        }
-
-        [Test]
         public void CloseOpenConnectionWithinTimeout()
         {
-            var closeResult = _factoryHelper
+            IQueueConnection closeResult;
+
+            using (closeResult = _factoryHelper
                 .SetOpenDuration(TimeSpan.FromSeconds(3))
                 .SetProcessDuration(TimeSpan.FromSeconds(1))
                 .GetListener()
-                .GetQueue(Exchange, QueueName)
-                .Listen()
-                .Close(TimeSpan.FromSeconds(3));
+                .Queue(QueueName)
+                .Open(c => c.CloseTimeout(TimeSpan.FromSeconds(3)))) ;
 
-            Assert.IsTrue(closeResult.Successful);
+            Assert.IsFalse(closeResult.IsOpen);
         }
 
         [Test]
         public void CloseOpenConnectionNotWithinTimeout()
         {
-            var closeResult = _factoryHelper
+            IQueueConnection connection;
+
+            using (connection = _factoryHelper
                 .SetOpenDuration(TimeSpan.FromSeconds(3))
                 .SetProcessDuration(TimeSpan.FromSeconds(5))
                 .GetListener()
-                .GetQueue(Exchange, QueueName)
-                .Listen()
-                .Close(TimeSpan.FromSeconds(1));
+                .Queue(QueueName)
+                .Open(c => c.CloseTimeout(TimeSpan.FromSeconds(1)))) ;
 
-            Assert.IsFalse(closeResult.Successful);
+            Assert.IsTrue(connection.IsOpen);
         }
 
         [Test]
         public void CloseOpenConnectionNotWithinTimeoutButIsClosedAfterTimeout()
         {
-            var openConnection = _factoryHelper
+            IQueueConnection openConnection;
+
+            using (openConnection = _factoryHelper
                 .SetOpenDuration(TimeSpan.FromSeconds(3))
                 .SetProcessDuration(TimeSpan.FromSeconds(5))
                 .GetListener()
-                .GetQueue(Exchange, QueueName)
-                .Listen();
+                .Queue(QueueName)
+                .Open(c => c.CloseTimeout(TimeSpan.FromSeconds(1)))) ;
 
-            var closeResult = openConnection.Close(TimeSpan.FromSeconds(1));
+            Assert.IsTrue(openConnection.IsOpen);
 
-            Assert.IsFalse(closeResult.Successful);
-
-            Task.Delay(TimeSpan.FromSeconds(4));
+            Task.Delay(TimeSpan.FromSeconds(6)).Wait();
 
             Assert.IsFalse(openConnection.IsOpen);
-        }
-
-        [Test]
-        [ExpectedException(typeof (Exception))]
-        public void UnOpenedConnectionThrowsExceptionOnClose()
-        {
-            _factoryHelper
-                .SetOpenDuration(TimeSpan.FromSeconds(3))
-                .GetListener()
-                .GetQueue(Exchange, QueueName)
-                .Listen(TimeSpan.FromSeconds(1))
-                .Close();
         }
     }
 }

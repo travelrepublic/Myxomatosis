@@ -1,6 +1,5 @@
 ﻿using Myxomatosis.Connection;
 using Myxomatosis.Connection.Message;
-using Myxomatosis.Connection.Queue;
 using Myxomatosis.Logging;
 using NUnit.Framework;
 using System;
@@ -16,9 +15,8 @@ namespace Myxomatosis.Tests
         private string _exchange;
         private string _queue;
         private string _routingKey;
-
-        private IRabbitQueue<MyMessage> _queueConnection;
-        private IListeningConnection<MyMessage> _subscription;
+        private IQueueConnection _subscription;
+        private IQueueOpener _queueConnection;
 
         [SetUp]
         public void Init()
@@ -29,46 +27,54 @@ namespace Myxomatosis.Tests
 
             var rabbitConnection = ObservableConnectionFactory.Create(f => f.WithLogger(new RabbitMqConsoleLogger()));
 
-            _queueConnection = rabbitConnection.GetQueue<MyMessage>(_exchange, _queue, _routingKey, ExchangeType.Fanout);
+            rabbitConnection.SetUp(s => s.Exchange("EVERYTHING").Topic.BoundToQueue("LEFTOVERS"));
+            rabbitConnection.SetUp(s => s.Exchange(_exchange).Fanout
+                .BoundToQueue(_queue)
+                .BoundToExchange("EVERYTHING"));
+
+            _queueConnection = rabbitConnection.Queue(_queue);
 
             Enumerable.Range(0, 10).ToList().ForEach(i =>
             {
-                rabbitConnection.GetExchange<MyMessage>(_exchange, ExchangeType.Fanout)
-                    .Publish(new MyMessage { Greeting = "Message: " + i }, _routingKey);
+                Console.WriteLine("Publishing {0}", i);
+                rabbitConnection.Exchange(_exchange)
+                    .Publish(new MyMessage { Greeting = "Message: " + i });
             });
         }
 
         [Test]
         public void Test()
         {
-            _subscription = _queueConnection.Listen(TimeSpan.FromSeconds(1));
+            _subscription = _queueConnection.Open(c => c.OpenTimeout(TimeSpan.FromSeconds(1)));
 
             Task.Factory.StartNew(() =>
             {
-                _subscription
-                    .ToObservable()
-                    .SubscribeWithAck(rm => { Console.WriteLine("Recieved message: " + rm.Message.Greeting); });
+                using (var subs = _subscription
+                    .Stream<MyMessage>()
+                    .SubscribeWithAck(rm => { Console.WriteLine("Recieved message: " + rm.Message.Greeting); })) ;
             });
 
             Task.Delay(TimeSpan.FromSeconds(5)).Wait();
-
-            _subscription.Close(TimeSpan.FromSeconds(1));
         }
 
         [Test]
         public void ApiTest()
         {
-            //            var queueconnection = ObservableConnectionFactory.Create().GetQueue<MyMessage>("MessageExchange", "MessageQueue");
-            //
-            //            Enumerable.Range(0, 100).ToList().ForEach(i => queueconnection.Publish(new MyMessage
-            //            {
-            //                Greeting = string.Format("Hello message: {0}", i)
-            //            }));
+            var connection = ObservableConnectionFactory.Create();
 
-            //            queueconnection
-            //                .Listen()
-            //                .ToObservable()
-            //                .ToMessage<MyMessage>();
+            connection.SetUp(s => s.Exchange(_exchange).Fanout.BoundToQueue(_queue));
+
+            var queueconnection = connection.Queue("MessageQueue");
+            var exchange = connection.Exchange(_exchange);
+
+            Enumerable.Range(0, 100).ToList().ForEach(i => exchange.Publish(new MyMessage
+                {
+                    Greeting = string.Format("Hello message: {0}", i)
+                }));
+
+            queueconnection
+                .Open()
+                .Stream<MyMessage>();
         }
 
         private IObservable<RabbitMessage> Filter(IObservable<RabbitMessage> stream)
@@ -84,6 +90,8 @@ namespace Myxomatosis.Tests
 
     public class NullLogger : IRabbitMqClientLogger
     {
+        #region IRabbitMqClientLogger Members
+
         public void LogTrace(string message, params object[] args)
         {
         }
@@ -103,5 +111,7 @@ namespace Myxomatosis.Tests
         public void LogError(string message, Exception exception)
         {
         }
+
+        #endregion IRabbitMqClientLogger Members
     }
 }

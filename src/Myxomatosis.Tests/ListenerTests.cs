@@ -1,6 +1,6 @@
-using System;
 using Myxomatosis.Tests.Helpers;
 using NUnit.Framework;
+using System;
 
 namespace Myxomatosis.Tests
 {
@@ -25,8 +25,8 @@ namespace Myxomatosis.Tests
                 .GetListener();
 
             var open = listener
-                .GetQueue(Exchange, QueueName)
-                .Listen(TimeSpan.FromSeconds(3));
+                .Queue(QueueName)
+                .Open(c => c.OpenTimeout(TimeSpan.FromSeconds(3)));
         }
 
         [Test]
@@ -36,24 +36,10 @@ namespace Myxomatosis.Tests
                 .SetOpenDuration(TimeSpan.FromSeconds(3))
                 .GetListener();
 
-            var open = listener.GetQueue(Exchange, QueueName).Listen(TimeSpan.FromSeconds(5));
+            var open = listener.Queue(QueueName).Open(c => c.OpenTimeout(TimeSpan.FromSeconds(5)));
 
             //Now demand an open connection with timeout less than the subscription duration
-            open = listener.GetQueue(Exchange, QueueName).Listen(TimeSpan.FromSeconds(1));
+            open = listener.Queue(QueueName).Open(c => c.OpenTimeout(TimeSpan.FromSeconds(1)));
         }
-
-        [Test]
-        [ExpectedException(typeof(Exception))]
-        public void DoesNotOpenWithinTimeout()
-        {
-            var listener = _factory
-                .SetOpenDuration(TimeSpan.FromSeconds(5))
-                .GetListener();
-
-            var open = listener.GetQueue(Exchange, QueueName).Listen(TimeSpan.FromSeconds(1));
-        }
-
-
-
     }
 }

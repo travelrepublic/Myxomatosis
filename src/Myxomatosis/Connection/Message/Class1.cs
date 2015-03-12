@@ -41,34 +41,30 @@ namespace Myxomatosis.Connection.Message
 
         string Name { get; set; }
 
-        TimeSpan Interval { get; }
+        TimeSpan Interval { get; set; }
 
-        string QueueName { get; }
+        string QueueName { get; set; }
 
         string SubscriptionId { get; set; }
 
-        TimeSpan OpenTimeout { get; }
+        TimeSpan OpenTimeout { get; set; }
 
-        TimeSpan CloseTimeout { get; }
-
-        string Exchange { get; }
+        TimeSpan CloseTimeout { get; set; }
     }
 
     public class DefaultSubscriptionConfig : ISubscriptionConfig
     {
         #region Constructors
 
-        public DefaultSubscriptionConfig(string exchange, string queueName)
+        public DefaultSubscriptionConfig(string queueName)
         {
             Interval = TimeSpan.FromSeconds(0);
             OpenTimeout = TimeSpan.FromMinutes(1);
             CloseTimeout = TimeSpan.FromMinutes(1);
             SubscriptionId = string.Empty;
             Id = Guid.NewGuid().ToString();
-
-            Exchange = exchange;
             QueueName = queueName;
-            Name = string.Format("{0}::{1}", Exchange, QueueName);
+            Name = string.Format("{0}", QueueName);
         }
 
         #endregion Constructors
@@ -81,15 +77,13 @@ namespace Myxomatosis.Connection.Message
 
         public TimeSpan Interval { get; set; }
 
-        public string QueueName { get; private set; }
+        public string QueueName { get; set; }
 
         public string SubscriptionId { get; set; }
 
         public TimeSpan OpenTimeout { get; set; }
 
         public TimeSpan CloseTimeout { get; set; }
-
-        public string Exchange { get; private set; }
 
         #endregion ISubscriptionConfig Members
     }
@@ -106,7 +100,7 @@ namespace Myxomatosis.Connection.Message
         #region Constructors
 
         public DefaultBatchConfig(string exchange, string subscriberQueue)
-            : base(exchange, subscriberQueue)
+            : base(subscriberQueue)
         {
             BufferSize = 3;
             BufferTimeout = TimeSpan.FromSeconds(10);

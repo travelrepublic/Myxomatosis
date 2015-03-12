@@ -1,7 +1,9 @@
-﻿namespace Myxomatosis.Connection.Queue.Listen
+﻿using System.Threading.Tasks;
+
+namespace Myxomatosis.Connection.Queue.Listen
 {
     public interface IRabbitMqSubscriber
     {
-        void Subscribe(QueueSubscription subscription);
+        Task<object> SubscribeAsync(QueueSubscription subscription);
     }
 }

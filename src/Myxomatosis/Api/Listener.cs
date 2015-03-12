@@ -1,105 +1,56 @@
 ﻿using Myxomatosis.Connection;
 using Myxomatosis.Connection.Exchange;
+using Myxomatosis.Connection.Message;
 using Myxomatosis.Connection.Queue;
 using Myxomatosis.Connection.Queue.Listen;
-using Myxomatosis.Logging;
-using Myxomatosis.Serialization;
+using RabbitMQ.Client;
+using System;
 
 namespace Myxomatosis.Api
 {
-    public class Listener : IObservableConnection
+    public class ConnectionEntryPoint : IObservableConnection
     {
-        private readonly IRabbitMqClientLogger _logger;
-        private readonly IRabbitPublisher _publisher;
-        private readonly ISerializer _serializer;
-        private readonly IRabbitMqSubscriber _subscriberThread;
-        private readonly IQueueSubscriptionManager _subscriptionManager;
+        private readonly ConnectionFactory _connectionFactory;
+        private readonly IRabbitMqSubscriber _subscriber;
 
         #region Constructors
 
-        public Listener(
-            IRabbitMqSubscriber subscriberThread,
-            IRabbitPublisher publisher,
-            IQueueSubscriptionManager subscriptionManager,
-            ISerializer serializer,
-            IRabbitMqClientLogger logger)
+        public ConnectionEntryPoint(ConnectionFactory connectionFactory, IRabbitMqSubscriber subscriber)
         {
-            _subscriberThread = subscriberThread;
-            _publisher = publisher;
-            _subscriptionManager = subscriptionManager;
-            _serializer = serializer;
-            _logger = logger;
+            _connectionFactory = connectionFactory;
+            _subscriber = subscriber;
         }
 
         #endregion Constructors
 
         #region IObservableConnection Members
 
-        public IRabbitQueue GetQueue(string exchange, string queueName)
+        public IQueueOpener Queue(string queueName)
         {
-            return OpenConnectionInternal(exchange, queueName, null);
+            return new QueueOpener(queueName, _subscriber);
         }
 
-        public IRabbitQueue GetQueue(string exchange, string queueName, ExchangeType exchangeType)
+        public IExchange Exchange(string exchange)
         {
-            return OpenConnectionInternal(exchange, queueName, null, exchangeType);
+            return new Exchange(_connectionFactory, exchange);
         }
 
-        public IRabbitQueue GetQueue(string exchange, string queueName, string routingKey)
+        public IObservableConnection SetUp(Action<ITopologyBuilder> topologyConfig)
         {
-            return OpenConnectionInternal(exchange, queueName, routingKey);
-        }
-
-        public IRabbitQueue GetQueue(string exchange, string queueName, string routingKey, ExchangeType exchangeType)
-        {
-            return OpenConnectionInternal(exchange, queueName, routingKey, exchangeType);
-        }
-
-        public IRabbitQueue<T> GetQueue<T>(string exchange, string queueName)
-        {
-            return new QueueResult<T>(OpenConnectionInternal(exchange, queueName, null), _logger);
-        }
-
-        public IRabbitQueue<T> GetQueue<T>(string exchange, string queueName, ExchangeType exchangeType)
-        {
-            return new QueueResult<T>(OpenConnectionInternal(exchange, queueName, null, exchangeType), _logger);
-        }
-
-        public IRabbitQueue<T> GetQueue<T>(string exchange, string queueName, string routingKey)
-        {
-            return new QueueResult<T>(OpenConnectionInternal(exchange, queueName, routingKey), _logger);
-        }
-
-        public IRabbitQueue<T> GetQueue<T>(string exchange, string queueName, string routingKey, ExchangeType exchangeType)
-        {
-            return new QueueResult<T>(OpenConnectionInternal(exchange, queueName, routingKey, exchangeType), _logger);
-        }
-
-        public IRabbitExchange GetExchange(string exchange)
-        {
-            return GetExchange(exchange, ExchangeType.Topic);
-        }
-
-        public IRabbitExchange<T> GetExchange<T>(string exchange)
-        {
-            return GetExchange<T>(exchange, ExchangeType.Topic);
-        }
-
-        public IRabbitExchange GetExchange(string exchange, ExchangeType exchangeType)
-        {
-            return new Exchange(exchange, _publisher, _serializer, exchangeType);
-        }
-
-        public IRabbitExchange<T> GetExchange<T>(string exchange, ExchangeType exchangeType)
-        {
-            return new Exchange<T>(exchange, _publisher, _serializer, exchangeType);
+            var topologyBuilder = new TopologyBuilder(_connectionFactory);
+            topologyConfig(topologyBuilder);
+            return this;
         }
 
         #endregion IObservableConnection Members
 
-        private QueueResult OpenConnectionInternal(string exchange, string queueName, string routingKey, ExchangeType exchangeType = ExchangeType.Topic)
+        private ISubscriptionConfig GetConfig(string queueName, Action<ISubscriberConfigBuilder> config)
         {
-            return new QueueResult(exchange, queueName, routingKey, _subscriptionManager, _subscriberThread, exchangeType);
+            var startingConfig = new SubscriberConfigBuilder(queueName);
+            config(startingConfig);
+            var subscriptionConfig = startingConfig.GetConfig();
+
+            return subscriptionConfig;
         }
     }
 }

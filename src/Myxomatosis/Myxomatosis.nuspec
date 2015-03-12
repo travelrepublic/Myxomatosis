@@ -3,7 +3,7 @@
   <metadata>
     <id>Myxomatosis</id>
     <version>$version$</version>
-    <title>RabbitMQ Client</title>
+    <title>Myxomatosis</title>
     <authors>TravelRepublic</authors>
     <owners>TravelRepublic</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>

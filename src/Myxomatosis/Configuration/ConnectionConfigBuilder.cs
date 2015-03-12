@@ -14,7 +14,7 @@ namespace Myxomatosis.Configuration
             _configuration = new DefaultConfiguration();
         }
 
-        #endregion Constructors
+        #endregion
 
         #region IConnectionConfigBuilder Members
 
@@ -54,13 +54,13 @@ namespace Myxomatosis.Configuration
             return this;
         }
 
-        public IConnectionConfigBuilder WithPrefetchCount(int prefetchCount)
+        public IConnectionConfigBuilder WithPrefetchCount(ushort prefetchCount)
         {
             _configuration.PrefetchCount = prefetchCount;
             return this;
         }
 
-        #endregion IConnectionConfigBuilder Members
+        #endregion
 
         public IConnectionConfig Create()
         {
