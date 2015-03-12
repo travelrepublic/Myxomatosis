@@ -90,16 +90,16 @@ namespace Myxomatosis.Connection.Message
 
     public interface IBatchSubscriptionConfig : ISubscriptionConfig
     {
-        TimeSpan BufferTimeout { get; }
+        TimeSpan BufferTimeout { get; set; }
 
-        int BufferSize { get; }
+        int BufferSize { get; set; }
     }
 
     public class DefaultBatchConfig : DefaultSubscriptionConfig, IBatchSubscriptionConfig
     {
         #region Constructors
 
-        public DefaultBatchConfig(string exchange, string subscriberQueue)
+        public DefaultBatchConfig(string subscriberQueue)
             : base(subscriberQueue)
         {
             BufferSize = 3;

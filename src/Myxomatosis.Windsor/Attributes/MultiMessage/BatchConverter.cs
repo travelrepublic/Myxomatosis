@@ -1,6 +1,6 @@
+using System;
 using Myxomatosis.Connection.Message;
 using Myxomatosis.Windsor.Attributes.SingleMessage;
-using System;
 
 namespace Myxomatosis.Windsor.Attributes.MultiMessage
 {
@@ -10,7 +10,7 @@ namespace Myxomatosis.Windsor.Attributes.MultiMessage
 
         public IBatchSubscriptionConfig Convert(IStaticBatchSubscriptionConfig source)
         {
-            return new DefaultBatchConfig(source.Exchange, source.QueueName)
+            return new DefaultBatchConfig(source.QueueName)
             {
                 CloseTimeout = TimeSpan.FromMilliseconds(source.CloseTimeout),
                 OpenTimeout = TimeSpan.FromMilliseconds(source.OpenTimeout),
@@ -22,6 +22,6 @@ namespace Myxomatosis.Windsor.Attributes.MultiMessage
             };
         }
 
-        #endregion IConverter<IStaticBatchSubscriptionConfig,IBatchSubscriptionConfig> Members
+        #endregion
     }
 }
