@@ -71,37 +71,33 @@ namespace Myxomatosis.Connection
     {
         private readonly ConnectionFactory _connectionFactory;
 
+        #region Constructors
+
         public TopologyBuilder(ConnectionFactory connectionFactory)
         {
             _connectionFactory = connectionFactory;
         }
+
+        #endregion Constructors
+
+        #region ITopologyBuilder Members
 
         public IExchangeTypes Exchange(string exchangeName)
         {
             return new ExchangeTypes(exchangeName, _connectionFactory);
         }
 
-        private class ExchangeTypes : IExchangeTypes
-        {
-            private readonly string _exchangeName;
-            private readonly ConnectionFactory _connectionFactory;
+        #endregion ITopologyBuilder Members
 
-            public ExchangeTypes(string exchangeName, ConnectionFactory connectionFactory)
-            {
-                _exchangeName = exchangeName;
-                this._connectionFactory = connectionFactory;
-            }
-
-            public IFanoutExchangeBuilder Fanout { get { return new FanoutExchangeBuidler(_connectionFactory, _exchangeName); } }
-
-            public ITopicExchangeBuilder Topic { get { return new TopicExchangeBuilder(_connectionFactory, _exchangeName); } }
-        }
+        #region Nested type: ExchangeBuilderBase
 
         private abstract class ExchangeBuilderBase
         {
+            private readonly ExchangeType _exchangeType;
             protected readonly ConnectionFactory ConnectionFactory;
             protected readonly string ExchangeName;
-            private readonly ExchangeType _exchangeType;
+
+            #region Constructors
 
             protected ExchangeBuilderBase(ConnectionFactory connectionFactory, string exchangeName, ExchangeType exchangeType)
             {
@@ -111,6 +107,8 @@ namespace Myxomatosis.Connection
 
                 CreateExchange();
             }
+
+            #endregion Constructors
 
             private void CreateExchange()
             {
@@ -124,12 +122,56 @@ namespace Myxomatosis.Connection
             }
         }
 
+        #endregion Nested type: ExchangeBuilderBase
+
+        #region Nested type: ExchangeTypes
+
+        private class ExchangeTypes : IExchangeTypes
+        {
+            private readonly ConnectionFactory _connectionFactory;
+            private readonly string _exchangeName;
+
+            #region Constructors
+
+            public ExchangeTypes(string exchangeName, ConnectionFactory connectionFactory)
+            {
+                _exchangeName = exchangeName;
+                _connectionFactory = connectionFactory;
+            }
+
+            #endregion Constructors
+
+            #region IExchangeTypes Members
+
+            public IFanoutExchangeBuilder Fanout
+            {
+                get { return new FanoutExchangeBuidler(_connectionFactory, _exchangeName); }
+            }
+
+            public ITopicExchangeBuilder Topic
+            {
+                get { return new TopicExchangeBuilder(_connectionFactory, _exchangeName); }
+            }
+
+            #endregion IExchangeTypes Members
+        }
+
+        #endregion Nested type: ExchangeTypes
+
+        #region Nested type: FanoutExchangeBuidler
+
         private class FanoutExchangeBuidler : ExchangeBuilderBase, IFanoutExchangeBuilder
         {
+            #region Constructors
+
             public FanoutExchangeBuidler(ConnectionFactory connectionFactory, string exchangeName)
                 : base(connectionFactory, exchangeName, ExchangeType.Fanout)
             {
             }
+
+            #endregion Constructors
+
+            #region IFanoutExchangeBuilder Members
 
             public IFanoutExchangeBuilder BoundToQueue(string queueName)
             {
@@ -157,14 +199,26 @@ namespace Myxomatosis.Connection
 
                 return this;
             }
+
+            #endregion IFanoutExchangeBuilder Members
         }
+
+        #endregion Nested type: FanoutExchangeBuidler
+
+        #region Nested type: TopicExchangeBuilder
 
         private class TopicExchangeBuilder : ExchangeBuilderBase, ITopicExchangeBuilder
         {
+            #region Constructors
+
             public TopicExchangeBuilder(ConnectionFactory connectionFactory, string exchangeName)
                 : base(connectionFactory, exchangeName, ExchangeType.Topic)
             {
             }
+
+            #endregion Constructors
+
+            #region ITopicExchangeBuilder Members
 
             public ITopicExchangeBuilder BoundToQueue(string queueName)
             {
@@ -202,7 +256,11 @@ namespace Myxomatosis.Connection
 
                 return this;
             }
+
+            #endregion ITopicExchangeBuilder Members
         }
+
+        #endregion Nested type: TopicExchangeBuilder
     }
 
     public interface IQueueOpener
@@ -226,6 +284,8 @@ namespace Myxomatosis.Connection
         ISubscriberConfigBuilder OpenTimeout(TimeSpan openTimeout);
 
         ISubscriberConfigBuilder CloseTimeout(TimeSpan openTimeout);
+
+        ISubscriberConfigBuilder PrefetchCount(ushort prefetchCount);
     }
 
     internal class SubscriberConfigBuilder : ISubscriberConfigBuilder
@@ -252,6 +312,12 @@ namespace Myxomatosis.Connection
         public ISubscriberConfigBuilder CloseTimeout(TimeSpan closeTimeout)
         {
             _subscriptionConfig.CloseTimeout = closeTimeout;
+            return this;
+        }
+
+        public ISubscriberConfigBuilder PrefetchCount(ushort prefetchCount)
+        {
+            _subscriptionConfig.PrefetchCount = prefetchCount;
             return this;
         }
 

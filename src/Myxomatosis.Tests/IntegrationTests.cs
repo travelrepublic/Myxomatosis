@@ -45,7 +45,7 @@ namespace Myxomatosis.Tests
         [Test]
         public void Test()
         {
-            _subscription = _queueConnection.Open(c => c.OpenTimeout(TimeSpan.FromSeconds(1)));
+            _subscription = _queueConnection.Open(c => c.OpenTimeout(TimeSpan.FromSeconds(1)).PrefetchCount(20));
 
             Task.Factory.StartNew(() =>
             {

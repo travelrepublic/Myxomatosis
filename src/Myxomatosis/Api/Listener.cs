@@ -1,6 +1,5 @@
 ﻿using Myxomatosis.Connection;
 using Myxomatosis.Connection.Exchange;
-using Myxomatosis.Connection.Message;
 using Myxomatosis.Connection.Queue;
 using Myxomatosis.Connection.Queue.Listen;
 using RabbitMQ.Client;
@@ -45,14 +44,5 @@ namespace Myxomatosis.Api
         }
 
         #endregion IObservableConnection Members
-
-        private ISubscriptionConfig GetConfig(string queueName, Action<ISubscriberConfigBuilder> config)
-        {
-            var startingConfig = new SubscriberConfigBuilder(queueName);
-            config(startingConfig);
-            var subscriptionConfig = startingConfig.GetConfig();
-
-            return subscriptionConfig;
-        }
     }
 }

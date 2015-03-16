@@ -13,14 +13,18 @@ namespace Myxomatosis.Connection.Queue.Listen
     {
         private readonly ConcurrentDictionary<string, QueueSubscription> _subscriptions;
 
+        #region Constructors
+
         public QueueSubscriptionCache()
         {
             _subscriptions = new ConcurrentDictionary<string, QueueSubscription>();
         }
 
-        public QueueSubscription Create(string queueName, ushort prefetchCount = 50)
+        #endregion Constructors
+
+        public QueueSubscription Create(string queueName, ushort prefetchCount)
         {
-            return _subscriptions.GetOrAdd(queueName, q => new QueueSubscription(q) { PrefetchCount = prefetchCount });
+            return _subscriptions.GetOrAdd(queueName, q => new QueueSubscription(q, prefetchCount));
         }
 
         public void Remove(string queueName)
@@ -36,20 +40,18 @@ namespace Myxomatosis.Connection.Queue.Listen
 
         #region Constructors
 
-        internal QueueSubscription(string queue)
+        internal QueueSubscription(string queue, ushort prefetchCount)
         {
             _subject = new ReplaySubject<RabbitMessage>();
-            SubscriptionData = new QueueSubscriptionData(queue);
+            SubscriptionData = new QueueSubscriptionData(queue)
+            {
+                PrefetchCount = prefetchCount
+            };
             KeepListening = true;
             OpenEvent = new ManualResetEvent(false);
         }
 
         #endregion Constructors
-
-        public ushort PrefetchCount
-        {
-            set { SubscriptionData.PrefetchCount = value; }
-        }
 
         public QueueSubscriptionData SubscriptionData { get; private set; }
 

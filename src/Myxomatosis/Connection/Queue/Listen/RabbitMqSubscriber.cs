@@ -70,7 +70,7 @@ namespace Myxomatosis.Connection.Queue.Listen
                     while (subscription.KeepListening)
                     {
                         BasicDeliverEventArgs basicDeliverEventArgs;
-                        if (!consumer.Queue.Dequeue((int) TimeSpan.FromSeconds(5).TotalMilliseconds, out basicDeliverEventArgs))
+                        if (!consumer.Queue.Dequeue((int)TimeSpan.FromSeconds(5).TotalMilliseconds, out basicDeliverEventArgs))
                             continue;
 
                         _logger.LogTrace("Dequeued message with delivery tag {0}", basicDeliverEventArgs.DeliveryTag);

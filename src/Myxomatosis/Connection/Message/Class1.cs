@@ -50,6 +50,8 @@ namespace Myxomatosis.Connection.Message
         TimeSpan OpenTimeout { get; set; }
 
         TimeSpan CloseTimeout { get; set; }
+
+        ushort PrefetchCount { get; set; }
     }
 
     public class DefaultSubscriptionConfig : ISubscriptionConfig
@@ -65,6 +67,7 @@ namespace Myxomatosis.Connection.Message
             Id = Guid.NewGuid().ToString();
             QueueName = queueName;
             Name = string.Format("{0}", QueueName);
+            PrefetchCount = 50;
         }
 
         #endregion Constructors
@@ -84,6 +87,8 @@ namespace Myxomatosis.Connection.Message
         public TimeSpan OpenTimeout { get; set; }
 
         public TimeSpan CloseTimeout { get; set; }
+
+        public ushort PrefetchCount { get; set; }
 
         #endregion ISubscriptionConfig Members
     }
