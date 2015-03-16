@@ -13,17 +13,25 @@ namespace Myxomatosis.Api
         private readonly object _listenPadlock;
         private readonly string _queueName;
         private readonly IRabbitMqSubscriber _subscriberThread;
+        private readonly QueueSubscriptionCache _subscriptionCache;
 
-        public QueueOpener(string queueName, IRabbitMqSubscriber subscriberThread)
+        #region Constructors
+
+        public QueueOpener(string queueName, IRabbitMqSubscriber subscriberThread, QueueSubscriptionCache subscriptionCache)
         {
             _queueName = queueName;
             _subscriberThread = subscriberThread;
+            _subscriptionCache = subscriptionCache;
             _listenPadlock = new object();
         }
 
+        #endregion Constructors
+
+        #region IQueueOpener Members
+
         public IQueueConnection Open(Action<ISubscriberConfigBuilder> configBuilder)
         {
-            var queueSubscription = QueueSubscription.Create(_queueName);
+            var queueSubscription = _subscriptionCache.Create(_queueName);
 
             var config = GetConfig(configBuilder);
 
@@ -31,11 +39,11 @@ namespace Myxomatosis.Api
             {
                 if (queueSubscription.ConsumingTask == null)
                     queueSubscription.ConsumingTask = _subscriberThread.SubscribeAsync(queueSubscription);
-                else return new ListeningConnection(queueSubscription, config);
+                else return new ListeningConnection(queueSubscription, config, _subscriptionCache);
             }
 
             var opened = queueSubscription.OpenEvent.WaitOne(config.OpenTimeout);
-            if (opened) return new ListeningConnection(queueSubscription, config);
+            if (opened) return new ListeningConnection(queueSubscription, config, _subscriptionCache);
             throw new Exception(string.Format("Could not open listening channel within {0} to {1}", config.OpenTimeout, queueSubscription.SubscriptionData));
         }
 
@@ -44,9 +52,11 @@ namespace Myxomatosis.Api
             return Open(_ => { });
         }
 
+        #endregion IQueueOpener Members
+
         private ISubscriptionConfig GetConfig(Action<ISubscriberConfigBuilder> configBuilder)
         {
-            SubscriberConfigBuilder defaultConfig = new SubscriberConfigBuilder(_queueName);
+            var defaultConfig = new SubscriberConfigBuilder(_queueName);
             configBuilder(defaultConfig);
             return defaultConfig.GetConfig();
         }
@@ -55,15 +65,16 @@ namespace Myxomatosis.Api
     public class ListeningConnection : IQueueConnection
     {
         private readonly ISubscriptionConfig _config;
-
         private readonly QueueSubscription _queueSubscription;
+        private readonly QueueSubscriptionCache _subscriptionCache;
 
         #region Constructors
 
-        public ListeningConnection(QueueSubscription queueSubscription, ISubscriptionConfig config)
+        public ListeningConnection(QueueSubscription queueSubscription, ISubscriptionConfig config, QueueSubscriptionCache subscriptionCache)
         {
             _queueSubscription = queueSubscription;
             _config = config;
+            _subscriptionCache = subscriptionCache;
             Logger = new RabbitMqConsoleLogger();
         }
 
@@ -78,14 +89,6 @@ namespace Myxomatosis.Api
             get { return _queueSubscription.ConsumingTask.Status != TaskStatus.RanToCompletion; }
         }
 
-        private CloseConnectionResult Close()
-        {
-            _queueSubscription.KeepListening = false;
-            var closed = _queueSubscription.ConsumingTask.Wait(_config.CloseTimeout);
-            QueueSubscription.Remove(_queueSubscription.SubscriptionData.Queue);
-            return new CloseConnectionResult(closed);
-        }
-
         public IObservable<RabbitMessage> Stream()
         {
             return GetRawStream();
@@ -94,11 +97,32 @@ namespace Myxomatosis.Api
         public IObservable<RabbitMessage<T>> Stream<T>()
         {
             var stream = GetRawStream().ToMessage<T>();
-            //            stream.Subscribe(m => { }, e => { Logger.LogError("Myxomatosis exception: ", e); });
             return stream;
         }
 
+        public void Dispose()
+        {
+            try
+            {
+                Close();
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
         #endregion IQueueConnection Members
+
+        private CloseConnectionResult Close()
+        {
+            _queueSubscription.KeepListening = false;
+            var closed = _queueSubscription.ConsumingTask.Wait(_config.CloseTimeout);
+
+            _subscriptionCache.Remove(_queueSubscription.SubscriptionData.Queue);
+
+            return new CloseConnectionResult(closed);
+        }
 
         private IObservable<RabbitMessage> GetRawStream()
         {
@@ -138,17 +162,5 @@ namespace Myxomatosis.Api
         }
 
         #endregion Nested type: ConnectionDisposer
-
-        public void Dispose()
-        {
-            try
-            {
-                Close();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
     }
 }

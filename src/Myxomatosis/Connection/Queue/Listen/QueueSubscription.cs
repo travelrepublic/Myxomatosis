@@ -9,19 +9,34 @@ using System.Threading.Tasks;
 
 namespace Myxomatosis.Connection.Queue.Listen
 {
-    public class QueueSubscription : IDisposable
+    public class QueueSubscriptionCache
     {
-        private static readonly ConcurrentDictionary<string, QueueSubscription> _subscriptions;
-        private readonly ReplaySubject<RabbitMessage> _subject;
+        private readonly ConcurrentDictionary<string, QueueSubscription> _subscriptions;
 
-        #region Constructors
-
-        static QueueSubscription()
+        public QueueSubscriptionCache()
         {
             _subscriptions = new ConcurrentDictionary<string, QueueSubscription>();
         }
 
-        private QueueSubscription(string queue)
+        public QueueSubscription Create(string queueName, ushort prefetchCount = 50)
+        {
+            return _subscriptions.GetOrAdd(queueName, q => new QueueSubscription(q) { PrefetchCount = prefetchCount });
+        }
+
+        public void Remove(string queueName)
+        {
+            QueueSubscription removedItem;
+            _subscriptions.TryRemove(queueName, out removedItem);
+        }
+    }
+
+    public class QueueSubscription : IDisposable
+    {
+        private readonly ReplaySubject<RabbitMessage> _subject;
+
+        #region Constructors
+
+        internal QueueSubscription(string queue)
         {
             _subject = new ReplaySubject<RabbitMessage>();
             SubscriptionData = new QueueSubscriptionData(queue);
@@ -68,16 +83,5 @@ namespace Myxomatosis.Connection.Queue.Listen
         }
 
         #endregion IDisposable Members
-
-        public static QueueSubscription Create(string queueName, ushort prefetchCount = 50)
-        {
-            return _subscriptions.GetOrAdd(queueName, q => new QueueSubscription(q) {PrefetchCount = prefetchCount});
-        }
-
-        public static void Remove(string queueName)
-        {
-            QueueSubscription removedItem;
-            _subscriptions.TryRemove(queueName, out removedItem);
-        }
     }
 }

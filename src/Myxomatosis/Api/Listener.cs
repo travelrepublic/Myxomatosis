@@ -12,6 +12,7 @@ namespace Myxomatosis.Api
     {
         private readonly ConnectionFactory _connectionFactory;
         private readonly IRabbitMqSubscriber _subscriber;
+        private readonly QueueSubscriptionCache _subscriptionCache;
 
         #region Constructors
 
@@ -19,6 +20,7 @@ namespace Myxomatosis.Api
         {
             _connectionFactory = connectionFactory;
             _subscriber = subscriber;
+            _subscriptionCache = new QueueSubscriptionCache();
         }
 
         #endregion Constructors
@@ -27,7 +29,7 @@ namespace Myxomatosis.Api
 
         public IQueueOpener Queue(string queueName)
         {
-            return new QueueOpener(queueName, _subscriber);
+            return new QueueOpener(queueName, _subscriber, _subscriptionCache);
         }
 
         public IExchange Exchange(string exchange)
