@@ -13,7 +13,6 @@ namespace Myxomatosis.Windsor.Attributes.SingleMessage
             {
                 CloseTimeout = TimeSpan.FromMilliseconds(source.CloseTimeout),
                 OpenTimeout = TimeSpan.FromMilliseconds(source.OpenTimeout),
-                Interval = TimeSpan.FromMilliseconds(source.Interval),
                 SubscriptionId = source.SubscriptionId,
                 Name = source.Name
             };

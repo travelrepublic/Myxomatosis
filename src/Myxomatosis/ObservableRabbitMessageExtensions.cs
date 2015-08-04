@@ -50,7 +50,7 @@ namespace Myxomatosis
             return connection.Queue(config.QueueName)
                 .Open()
                 .Stream<T>()
-                .Pace(config.Interval).SubscribeWithAck(rm => { handler.Handle(rm.Message); });
+                .SubscribeWithAck(rm => { handler.Handle(rm.Message); });
         }
 
         public static IDisposable SubscribeOnQueueToMessage<T>(this IObservableConnection connection, IBatchSubscriptionConfig config, IRabbitMessageHandler<IEnumerable<T>> handler)
@@ -59,7 +59,6 @@ namespace Myxomatosis
                 .Open()
                 .Stream<T>()
                 .Buffer(config.BufferTimeout, config.BufferSize)
-                .Pace(config.Interval)
                 .Where(m => m.Any())
                 .Select(l => l.AsEnumerable()), l =>
                 {

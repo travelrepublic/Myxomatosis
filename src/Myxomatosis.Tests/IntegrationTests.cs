@@ -41,7 +41,7 @@ namespace Myxomatosis.Tests
             {
                 Console.WriteLine("Publishing {0}", i);
                 rabbitConnection.Exchange(_exchange)
-                    .Publish(new MyMessage {Greeting = "Message: " + i});
+                    .Publish(new MyMessage { Greeting = "Message: " + i });
             });
         }
 
@@ -56,7 +56,6 @@ namespace Myxomatosis.Tests
                 observable.Count().Subscribe(i => { Console.WriteLine("Count changed"); });
 
                 using (observable
-                    .Pace(TimeSpan.FromSeconds(5))
                     .SubscribeWithAck(rm =>
                     {
                         Console.WriteLine("Recieved message: " + rm.Message.Greeting);

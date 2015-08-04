@@ -41,8 +41,6 @@ namespace Myxomatosis.Connection.Message
 
         string Name { get; set; }
 
-        TimeSpan Interval { get; set; }
-
         string QueueName { get; set; }
 
         string SubscriptionId { get; set; }
@@ -60,7 +58,6 @@ namespace Myxomatosis.Connection.Message
 
         public DefaultSubscriptionConfig(string queueName)
         {
-            Interval = TimeSpan.FromSeconds(0);
             OpenTimeout = TimeSpan.FromMinutes(1);
             CloseTimeout = TimeSpan.FromMinutes(1);
             SubscriptionId = string.Empty;
@@ -77,8 +74,6 @@ namespace Myxomatosis.Connection.Message
         public string Id { get; set; }
 
         public string Name { get; set; }
-
-        public TimeSpan Interval { get; set; }
 
         public string QueueName { get; set; }
 
