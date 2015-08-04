@@ -16,7 +16,6 @@ namespace Myxomatosis.Connection.Queue.Listen
         private readonly ConnectionFactory _connectionFactory;
         private readonly IRabbitMessageErrorHandler _errorHandler;
         private readonly IRabbitMqClientLogger _logger;
-        private readonly List<RabbitMessage> _unprocessedQueue;
 
         #region Constructors
 
@@ -27,7 +26,6 @@ namespace Myxomatosis.Connection.Queue.Listen
             _connectionFactory = connectionFactory;
             _errorHandler = errorHandler;
             _logger = logger;
-            _unprocessedQueue = new List<RabbitMessage>();
         }
 
         #endregion Constructors
@@ -73,14 +71,13 @@ namespace Myxomatosis.Connection.Queue.Listen
                     while (subscription.KeepListening)
                     {
                         BasicDeliverEventArgs basicDeliverEventArgs = null;
-                        if (!consumer.Queue.Dequeue((int) TimeSpan.FromSeconds(5).TotalMilliseconds, out basicDeliverEventArgs))
+                        if (!consumer.Queue.Dequeue((int)TimeSpan.FromSeconds(5).TotalMilliseconds, out basicDeliverEventArgs))
                         {
                             if (basicDeliverEventArgs != null)
                                 throw new Exception("Could not get message within timeout - expected event args to be null");
                             continue;
                         }
 
-                        _logger.LogTrace("Dequeued message with delivery tag {0}", basicDeliverEventArgs.DeliveryTag);
                         var body = basicDeliverEventArgs.Body;
                         var headers = basicDeliverEventArgs.BasicProperties.Headers;
                         var message = new RabbitMessage
@@ -91,12 +88,9 @@ namespace Myxomatosis.Connection.Queue.Listen
                             Channel = model,
                             DeliveryTag = basicDeliverEventArgs.DeliveryTag,
                             ErrorHandler = _errorHandler,
-                            UnprocessedQueue = _unprocessedQueue
                         };
                         try
                         {
-                            _unprocessedQueue.Add(message);
-                            _logger.LogTrace("Publishing next message: {0} unprocessed messages in buffer", _unprocessedQueue.Count);
                             subscription.MessageObserver.OnNext(message);
                         }
                         catch (Exception e)

@@ -31,8 +31,7 @@ namespace Myxomatosis
                 Headers = m.RawHeaders.ToDictionary(i => i.Key, i => serializer.Deserialize<object>(i.Value)),
                 RawMessage = m.RawMessage,
                 Message = serializer.Deserialize<T>(m.RawMessage),
-                ErrorHandler = m.ErrorHandler,
-                UnprocessedQueue = m.UnprocessedQueue
+                ErrorHandler = m.ErrorHandler
             });
         }
     }
