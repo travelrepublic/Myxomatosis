@@ -1,8 +1,8 @@
+using Myxomatosis.Connection.Message;
+using Myxomatosis.Serialization;
 using System;
 using System.Linq;
 using System.Reactive.Linq;
-using Myxomatosis.Connection.Message;
-using Myxomatosis.Serialization;
 
 namespace Myxomatosis
 {
@@ -24,13 +24,15 @@ namespace Myxomatosis
         {
             return observable.Select(m => new RabbitMessage<T>
             {
+                Id = m.Id,
                 DeliveryTag = m.DeliveryTag,
                 Channel = m.Channel,
                 RawHeaders = m.RawHeaders,
                 Headers = m.RawHeaders.ToDictionary(i => i.Key, i => serializer.Deserialize<object>(i.Value)),
                 RawMessage = m.RawMessage,
                 Message = serializer.Deserialize<T>(m.RawMessage),
-                ErrorHandler = m.ErrorHandler
+                ErrorHandler = m.ErrorHandler,
+                UnprocessedQueue = m.UnprocessedQueue
             });
         }
     }

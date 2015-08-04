@@ -1,7 +1,7 @@
-﻿using System;
-using Myxomatosis.Connection.Exchange;
+﻿using Myxomatosis.Connection.Exchange;
 using Myxomatosis.Connection.Message;
 using Myxomatosis.Serialization;
+using System;
 
 namespace Myxomatosis.Connection.Errors
 {

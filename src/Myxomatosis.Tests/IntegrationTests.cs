@@ -14,9 +14,9 @@ namespace Myxomatosis.Tests
     {
         private string _exchange;
         private string _queue;
+        private IQueueOpener _queueConnection;
         private string _routingKey;
         private IQueueConnection _subscription;
-        private IQueueOpener _queueConnection;
 
         [SetUp]
         public void Init()
@@ -25,7 +25,10 @@ namespace Myxomatosis.Tests
             _queue = "TestQueue";
             _routingKey = "RouteMe";
 
-            var rabbitConnection = ObservableConnectionFactory.Create(f => f.WithLogger(new RabbitMqConsoleLogger()));
+            var rabbitConnection = ObservableConnectionFactory.Create(f => f.WithLogger(new RabbitMqConsoleLogger())
+                .WithUserName("test")
+                .WithPassword("test")
+                .WithHostName(Environment.MachineName));
 
             rabbitConnection.SetUp(s => s.Exchange("EVERYTHING").Topic.BoundToQueue("LEFTOVERS"));
             rabbitConnection.SetUp(s => s.Exchange(_exchange).Fanout
@@ -38,20 +41,27 @@ namespace Myxomatosis.Tests
             {
                 Console.WriteLine("Publishing {0}", i);
                 rabbitConnection.Exchange(_exchange)
-                    .Publish(new MyMessage { Greeting = "Message: " + i });
+                    .Publish(new MyMessage {Greeting = "Message: " + i});
             });
         }
 
         [Test]
         public void Test()
         {
-            _subscription = _queueConnection.Open(c => c.OpenTimeout(TimeSpan.FromSeconds(1)).PrefetchCount(20));
+            _subscription = _queueConnection.Open(c => c.OpenTimeout(TimeSpan.FromSeconds(1)).PrefetchCount(5));
 
             Task.Factory.StartNew(() =>
             {
-                using (var subs = _subscription
-                    .Stream<MyMessage>()
-                    .SubscribeWithAck(rm => { Console.WriteLine("Recieved message: " + rm.Message.Greeting); })) ;
+                var observable = _subscription.Stream<MyMessage>();
+                observable.Count().Subscribe(i => { Console.WriteLine("Count changed"); });
+
+                using (observable
+                    .Pace(TimeSpan.FromSeconds(5))
+                    .SubscribeWithAck(rm =>
+                    {
+                        Console.WriteLine("Recieved message: " + rm.Message.Greeting);
+                        Console.WriteLine(observable.Count());
+                    })) ;
             });
 
             Task.Delay(TimeSpan.FromSeconds(5)).Wait();
@@ -68,9 +78,9 @@ namespace Myxomatosis.Tests
             var exchange = connection.Exchange(_exchange);
 
             Enumerable.Range(0, 100).ToList().ForEach(i => exchange.Publish(new MyMessage
-                {
-                    Greeting = string.Format("Hello message: {0}", i)
-                }));
+            {
+                Greeting = string.Format("Hello message: {0}", i)
+            }));
 
             queueconnection
                 .Open()

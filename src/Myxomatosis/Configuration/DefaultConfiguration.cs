@@ -1,5 +1,6 @@
 ﻿using Myxomatosis.Logging;
 using Myxomatosis.Serialization;
+using System;
 
 namespace Myxomatosis.Configuration
 {
@@ -13,7 +14,7 @@ namespace Myxomatosis.Configuration
             VirtualHost = "/";
             UserName = "guest";
             Password = "guest";
-            HostName = "localhost";
+            HostName = Environment.MachineName;
             Logger = new RabbitMqConsoleLogger();
         }
 
