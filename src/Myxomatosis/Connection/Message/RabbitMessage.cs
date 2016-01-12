@@ -39,16 +39,16 @@ namespace Myxomatosis.Connection.Message
             Channel.BasicAck(DeliveryTag, false);
         }
 
-        void IRabbitMessageModel.Error()
+        void IRabbitMessageModel.Error(string exchangeName)
         {
-            ErrorHandler.Error(this);
+            ErrorHandler.Error(this, exchangeName);
         }
 
-        void IRabbitMessageModel.Error(Exception exception)
+        void IRabbitMessageModel.Error(Exception exception, string exchangeName)
         {
             if (exception == null)
                 throw new ArgumentException("Expected a non-null Exception", "exception");
-            ErrorHandler.Error(this, exception);
+            ErrorHandler.Error(this, exception, exchangeName);
         }
 
         public void Reject()

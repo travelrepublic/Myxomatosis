@@ -9,7 +9,7 @@ namespace Myxomatosis.Connection.Errors
     {
         private readonly IRabbitPublisher _publisher;
         private readonly ISerializer _serializer;
-        private readonly string ErrorQueueName = "ErrorExchange";
+        private readonly string ErrorExchangeName = "ErrorExchange";
 
         #region Constructors
 
@@ -23,17 +23,17 @@ namespace Myxomatosis.Connection.Errors
 
         #region IRabbitMessageErrorHandler Members
 
-        public virtual void Error(RabbitMessage message)
+        public virtual void Error(RabbitMessage message, string errorExchange = null)
         {
             var errorMessage = new ErrorMessage
             {
                 Message = MessageDetails.FromRabbitMessage(message)
             };
 
-            _publisher.Publish(_serializer.Serialize(errorMessage), ErrorQueueName);
+            _publisher.Publish(_serializer.Serialize(errorMessage), errorExchange ?? ErrorExchangeName);
         }
 
-        public virtual void Error(RabbitMessage message, Exception exception)
+        public virtual void Error(RabbitMessage message, Exception exception, string errorExchange = null)
         {
             var errorMessage = new ErrorMessage
             {
@@ -41,7 +41,7 @@ namespace Myxomatosis.Connection.Errors
                 Exception = ExceptionDetails.FromException(exception)
             };
 
-            _publisher.Publish(_serializer.Serialize(errorMessage), ErrorQueueName);
+            _publisher.Publish(_serializer.Serialize(errorMessage), errorExchange ?? ErrorExchangeName);
         }
 
         #endregion IRabbitMessageErrorHandler Members
