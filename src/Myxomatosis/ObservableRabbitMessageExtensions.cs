@@ -106,19 +106,19 @@ namespace Myxomatosis
                 }
             }
 
-            public void Error()
+            public void Error(string exchangeName = null)
             {
                 foreach (var rabbitMessageModel in _messageModels)
                 {
-                    rabbitMessageModel.Error();
+                    rabbitMessageModel.Error(exchangeName);
                 }
             }
 
-            public void Error(Exception exception)
+            public void Error(Exception exception, string exchangeName = null)
             {
                 foreach (var rabbitMessageModel in _messageModels)
                 {
-                    rabbitMessageModel.Error(exception);
+                    rabbitMessageModel.Error(exception, exchangeName);
                 }
             }
 

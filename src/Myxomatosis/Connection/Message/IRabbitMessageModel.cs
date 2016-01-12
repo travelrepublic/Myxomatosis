@@ -6,9 +6,9 @@ namespace Myxomatosis.Connection.Message
     {
         void Acknowledge();
 
-        void Error();
+        void Error(string exchangeName = null);
 
-        void Error(Exception exception);
+        void Error(Exception exception, string exchangeName = null);
 
         void Reject();
     }
