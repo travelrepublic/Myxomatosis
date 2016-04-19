@@ -32,7 +32,7 @@ namespace Myxomatosis.Api
         public IQueueConnection Open(Action<ISubscriberConfigBuilder> configBuilder)
         {
             var config = GetConfig(configBuilder);
-            var queueSubscription = _subscriptionCache.Create(_queueName, config.PrefetchCount);
+            var queueSubscription = _subscriptionCache.Create(_queueName, config.PrefetchCount, config.Args);
 
             lock (_listenPadlock)
             {

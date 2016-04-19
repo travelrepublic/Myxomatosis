@@ -1,4 +1,5 @@
-﻿using Myxomatosis.Connection.Message;
+﻿using System.Collections.Generic;
+using Myxomatosis.Connection.Message;
 using System;
 using System.Collections.Concurrent;
 using System.Reactive;
@@ -22,9 +23,9 @@ namespace Myxomatosis.Connection.Queue.Listen
 
         #endregion Constructors
 
-        public QueueSubscription Create(string queueName, ushort prefetchCount)
+        public QueueSubscription Create(string queueName, ushort prefetchCount, Dictionary<string, object> args )
         {
-            return _subscriptions.GetOrAdd(queueName, q => new QueueSubscription(q, prefetchCount));
+            return _subscriptions.GetOrAdd(queueName, q => new QueueSubscription(q, prefetchCount, args));
         }
 
         public void Remove(string queueName)
@@ -40,12 +41,13 @@ namespace Myxomatosis.Connection.Queue.Listen
 
         #region Constructors
 
-        internal QueueSubscription(string queue, ushort prefetchCount)
+        internal QueueSubscription(string queue, ushort prefetchCount, Dictionary<string, object> args )
         {
             _subject = new ReplaySubject<RabbitMessage>();
             SubscriptionData = new QueueSubscriptionData(queue)
             {
-                PrefetchCount = prefetchCount
+                PrefetchCount = prefetchCount,
+                Args = args
             };
             KeepListening = true;
             OpenEvent = new ManualResetEvent(false);

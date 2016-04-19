@@ -60,7 +60,7 @@ namespace Myxomatosis.Connection.Queue.Listen
 
                     var queueName = subscription.SubscriptionData.Queue;
 
-                    model.DeclareQueue(queueName);
+                    model.DeclareQueue(queueName, subscription.SubscriptionData.Args);
 
                     model.BasicQos(0, subscription.SubscriptionData.PrefetchCount, false);
                     model.BasicConsume(queueName, false, consumer);

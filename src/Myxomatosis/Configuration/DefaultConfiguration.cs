@@ -12,8 +12,8 @@ namespace Myxomatosis.Configuration
         {
             Serializer = DefaultSerializer.Instance;
             VirtualHost = "/";
-            UserName = "guest";
-            Password = "guest";
+            UserName = "test";
+            Password = "test";
             HostName = Environment.MachineName;
             Logger = new RabbitMqConsoleLogger();
         }
