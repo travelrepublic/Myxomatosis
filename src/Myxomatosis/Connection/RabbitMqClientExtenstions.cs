@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using System.Collections.Generic;
+using RabbitMQ.Client;
 
 namespace Myxomatosis.Connection
 {
@@ -9,9 +10,9 @@ namespace Myxomatosis.Connection
             model.ExchangeDeclare(exchange, type, true);
         }
 
-        public static void DeclareQueue(this IModel model, string queueName)
+        public static void DeclareQueue(this IModel model, string queueName, Dictionary<string, object> args )
         {
-            model.QueueDeclare(queueName, true, false, false, null);
+            model.QueueDeclare(queueName, true, false, false, args);
         }
     }
 }

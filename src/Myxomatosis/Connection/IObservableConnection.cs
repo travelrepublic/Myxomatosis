@@ -1,4 +1,5 @@
-﻿using Myxomatosis.Connection.Message;
+﻿using System.Collections.Generic;
+using Myxomatosis.Connection.Message;
 using Myxomatosis.Connection.Queue;
 using RabbitMQ.Client;
 using System;
@@ -51,7 +52,7 @@ namespace Myxomatosis.Connection
 
     public interface IFanoutExchangeBuilder
     {
-        IFanoutExchangeBuilder BoundToQueue(string queueName);
+        IFanoutExchangeBuilder BoundToQueue(string queueName, Dictionary<string, object> args);
 
         IFanoutExchangeBuilder BoundToExchange(string exchangeName);
     }
@@ -60,7 +61,7 @@ namespace Myxomatosis.Connection
     {
         ITopicExchangeBuilder BoundToQueue(string queueName);
 
-        ITopicExchangeBuilder BoundToQueue(string queueName, string routingKey);
+        ITopicExchangeBuilder BoundToQueue(string queueName, string routingKey, Dictionary<string, object> args);
 
         ITopicExchangeBuilder BoundToExchange(string exchangeName);
 
@@ -173,13 +174,13 @@ namespace Myxomatosis.Connection
 
             #region IFanoutExchangeBuilder Members
 
-            public IFanoutExchangeBuilder BoundToQueue(string queueName)
+            public IFanoutExchangeBuilder BoundToQueue(string queueName, Dictionary<string, object> args)
             {
                 using (var connection = ConnectionFactory.CreateConnection())
                 {
                     using (var model = connection.CreateModel())
                     {
-                        model.QueueDeclare(queueName, true, false, false, null);
+                        model.QueueDeclare(queueName, true, false, false, args);
                         model.QueueBind(queueName, ExchangeName, string.Empty, null);
                     }
                 }
@@ -222,16 +223,16 @@ namespace Myxomatosis.Connection
 
             public ITopicExchangeBuilder BoundToQueue(string queueName)
             {
-                return BoundToQueue(queueName, string.Empty);
+                return BoundToQueue(queueName, string.Empty, null);
             }
 
-            public ITopicExchangeBuilder BoundToQueue(string queueName, string routingKey)
+            public ITopicExchangeBuilder BoundToQueue(string queueName, string routingKey, Dictionary<string, object> args)
             {
                 using (var connection = ConnectionFactory.CreateConnection())
                 {
                     using (var model = connection.CreateModel())
                     {
-                        model.QueueDeclare(queueName, true, false, false, null);
+                        model.QueueDeclare(queueName, true, false, false, args);
                         model.QueueBind(queueName, ExchangeName, routingKey, null);
                     }
                 }
@@ -286,6 +287,8 @@ namespace Myxomatosis.Connection
         ISubscriberConfigBuilder CloseTimeout(TimeSpan openTimeout);
 
         ISubscriberConfigBuilder PrefetchCount(ushort prefetchCount);
+
+        ISubscriberConfigBuilder ArgList(Dictionary<string, object> args);
     }
 
     internal class SubscriberConfigBuilder : ISubscriberConfigBuilder
@@ -319,6 +322,13 @@ namespace Myxomatosis.Connection
         {
             _subscriptionConfig.PrefetchCount = prefetchCount;
             return this;
+        }
+
+        public ISubscriberConfigBuilder ArgList(Dictionary<string, object> args)
+        {
+            _subscriptionConfig.Args = args;
+            return this;
+
         }
 
         #endregion ISubscriberConfigBuilder Members

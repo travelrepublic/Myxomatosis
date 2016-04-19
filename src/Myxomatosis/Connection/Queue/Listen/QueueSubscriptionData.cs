@@ -1,4 +1,6 @@
-﻿namespace Myxomatosis.Connection.Queue.Listen
+﻿using System.Collections.Generic;
+
+namespace Myxomatosis.Connection.Queue.Listen
 {
     public class QueueSubscriptionData
     {
@@ -15,5 +17,7 @@
         public string Queue { get; private set; }
 
         public ushort PrefetchCount { get; set; }
+
+        public Dictionary<string, object> Args { get; set; } 
     }
 }

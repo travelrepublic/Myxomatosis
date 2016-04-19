@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Myxomatosis.Connection.Message
 {
@@ -50,6 +51,8 @@ namespace Myxomatosis.Connection.Message
         TimeSpan CloseTimeout { get; set; }
 
         ushort PrefetchCount { get; set; }
+
+        Dictionary<string, object> Args { get; set; }
     }
 
     public class DefaultSubscriptionConfig : ISubscriptionConfig
@@ -84,6 +87,8 @@ namespace Myxomatosis.Connection.Message
         public TimeSpan CloseTimeout { get; set; }
 
         public ushort PrefetchCount { get; set; }
+
+        public Dictionary<string, object> Args { get; set; }
 
         #endregion ISubscriptionConfig Members
     }
