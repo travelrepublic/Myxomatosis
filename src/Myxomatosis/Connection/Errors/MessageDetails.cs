@@ -5,7 +5,7 @@ using Myxomatosis.Connection.Message;
 
 namespace Myxomatosis.Connection.Errors
 {
-    public class MessageDetails
+    internal class MessageDetails
     {
         public IDictionary<string, string> Headers { get; set; }
 

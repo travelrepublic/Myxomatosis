@@ -64,12 +64,9 @@
     <Compile Include="QueueConnectionTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Myxomatosis\Myxomatosis.csproj">
-      <Project>{6433aaeb-c28e-4039-a4ef-c315ee48a2eb}</Project>
-      <Name>Myxomatosis</Name>
+    <ProjectReference Include="..\Myxomatosis_NET45\Myxomatosis_NET45.csproj">
+      <Project>{73e683df-0881-4c5b-812d-be7a5d583d69}</Project>
+      <Name>Myxomatosis_NET45</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

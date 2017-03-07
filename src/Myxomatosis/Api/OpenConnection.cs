@@ -5,13 +5,16 @@ using Myxomatosis.Connection.Queue.Listen;
 
 namespace Myxomatosis.Api
 {
-    public abstract class OpenConnection : IOpenConnection
+    /// <summary>
+    /// Used to manage an open connection to RabbitMQ server, listenening on a particular queue
+    /// </summary>
+    internal abstract class OpenConnection : IOpenConnection
     {
-        private readonly QueueSubscription _queueSubscription;
+        private readonly QueueSubscriptionToken _queueSubscription;
 
         #region Constructors
 
-        protected OpenConnection(QueueSubscription queueSubscription)
+        protected OpenConnection(QueueSubscriptionToken queueSubscription)
         {
             _queueSubscription = queueSubscription;
         }
@@ -22,7 +25,7 @@ namespace Myxomatosis.Api
 
         public bool IsOpen
         {
-            get { return _queueSubscription.ConsumingTask.Status == TaskStatus.RanToCompletion; }
+            get { return _queueSubscription.KeepListening; }
         }
 
         public CloseConnectionResult Close()
@@ -40,7 +43,7 @@ namespace Myxomatosis.Api
         private CloseConnectionResult CloseConnectionInternal(TimeSpan closeTimeout)
         {
             _queueSubscription.KeepListening = false;
-            var closed = _queueSubscription.ConsumingTask.Wait(closeTimeout);
+            var closed = _queueSubscription.ClosedEvent.WaitOne(closeTimeout);
             return new CloseConnectionResult(closed);
         }
     }

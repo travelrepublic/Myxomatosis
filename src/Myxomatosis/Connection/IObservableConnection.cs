@@ -8,11 +8,30 @@ namespace Myxomatosis.Connection
 {
     public interface IObservableConnection
     {
-        IQueueOpener Queue(string queueName);
+        IQueue Queue(string queueName);
 
         IExchange Exchange(string exchange);
 
         IObservableConnection SetUp(Action<ITopologyBuilder> topologyConfig);
+    }
+
+    public interface IExchange
+    {
+        void Publish(byte[] message);
+
+        void Publish(byte[] message, string routingKey);
+
+        void Publish(byte[] message, IDictionary<string, byte[]> headers);
+
+        void Publish(byte[] message, IDictionary<string, byte[]> headers, string routingKey);
+
+        void Publish<T>(T message);
+
+        void Publish<T>(T message, string routingKey);
+
+        void Publish<T>(T message, IDictionary<string, object> headers);
+
+        void Publish<T>(T message, IDictionary<string, object> headers, string routingKey);
     }
 
     public enum ExchangeType
@@ -264,7 +283,7 @@ namespace Myxomatosis.Connection
         #endregion Nested type: TopicExchangeBuilder
     }
 
-    public interface IQueueOpener
+    public interface IQueue
     {
         IQueueConnection Open();
 

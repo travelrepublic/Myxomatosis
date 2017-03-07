@@ -7,15 +7,18 @@ using System;
 
 namespace Myxomatosis.Api
 {
-    public class ConnectionEntryPoint : IObservableConnection
+    /// <summary>
+    /// Represents a single connection to a RabbitMQ Server
+    /// </summary>
+    internal class ConnectionEntryPoint : IObservableConnection
     {
         private readonly ConnectionFactory _connectionFactory;
-        private readonly IRabbitMqSubscriber _subscriber;
+        private readonly RabbitMqQueueListener _subscriber;
         private readonly QueueSubscriptionCache _subscriptionCache;
 
         #region Constructors
 
-        public ConnectionEntryPoint(ConnectionFactory connectionFactory, IRabbitMqSubscriber subscriber)
+        public ConnectionEntryPoint(ConnectionFactory connectionFactory, RabbitMqQueueListener subscriber)
         {
             _connectionFactory = connectionFactory;
             _subscriber = subscriber;
@@ -26,9 +29,9 @@ namespace Myxomatosis.Api
 
         #region IObservableConnection Members
 
-        public IQueueOpener Queue(string queueName)
+        public IQueue Queue(string queueName)
         {
-            return new QueueOpener(queueName, _subscriber, _subscriptionCache);
+            return new RabbitQueue(queueName, _subscriber, _subscriptionCache);
         }
 
         public IExchange Exchange(string exchange)

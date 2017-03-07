@@ -1,18 +1,18 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myxomatosis", "Myxomatosis\Myxomatosis.csproj", "{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myxomatosis.Tests", "Myxomatosis.Tests\Myxomatosis.Tests.csproj", "{84A688EF-F510-4771-9D81-9CFD11D69DE9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myxomatosis.Windsor", "Myxomatosis.Windsor\Myxomatosis.Windsor.csproj", "{3CCCACD5-B0BF-48DA-9102-91A16BE80152}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9BCD9703-D737-4DBD-B7C2-0EBBD5497754}"
 	ProjectSection(SolutionItems) = preProject
 		Performance1.psess = Performance1.psess
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myxomatosis_NET45", "Myxomatosis_NET45\Myxomatosis_NET45.csproj", "{73E683DF-0881-4C5B-812D-BE7A5D583D69}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myxomatosis", "Myxomatosis\Myxomatosis.csproj", "{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,18 +20,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{84A688EF-F510-4771-9D81-9CFD11D69DE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{84A688EF-F510-4771-9D81-9CFD11D69DE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{84A688EF-F510-4771-9D81-9CFD11D69DE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{84A688EF-F510-4771-9D81-9CFD11D69DE9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3CCCACD5-B0BF-48DA-9102-91A16BE80152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3CCCACD5-B0BF-48DA-9102-91A16BE80152}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3CCCACD5-B0BF-48DA-9102-91A16BE80152}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3CCCACD5-B0BF-48DA-9102-91A16BE80152}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73E683DF-0881-4C5B-812D-BE7A5D583D69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73E683DF-0881-4C5B-812D-BE7A5D583D69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73E683DF-0881-4C5B-812D-BE7A5D583D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73E683DF-0881-4C5B-812D-BE7A5D583D69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,6 @@
 ﻿namespace Myxomatosis.Connection.Errors
 {
-    public class ErrorMessage
+    internal class ErrorMessage
     {
         public ExceptionDetails Exception { get; set; }
 

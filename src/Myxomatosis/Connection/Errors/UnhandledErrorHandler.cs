@@ -5,7 +5,7 @@ using System;
 
 namespace Myxomatosis.Connection.Errors
 {
-    public class UnhandledErrorHandler : IRabbitMessageErrorHandler
+    internal class UnhandledErrorHandler : IRabbitMessageErrorHandler
     {
         private readonly IRabbitPublisher _publisher;
         private readonly ISerializer _serializer;

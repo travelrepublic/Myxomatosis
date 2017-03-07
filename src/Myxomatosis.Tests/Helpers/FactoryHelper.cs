@@ -7,78 +7,78 @@ using System.Threading.Tasks;
 
 namespace Myxomatosis.Tests.Helpers
 {
-    public class FactoryHelper
-    {
-        private readonly MockSubscriberThread _supplierThreadMock;
+    //public class FactoryHelper
+    //{
+    //    private readonly MockSubscriberThread _supplierThreadMock;
 
-        #region Constructors
+    //    #region Constructors
 
-        public FactoryHelper()
-        {
-            _supplierThreadMock = new MockSubscriberThread(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3));
-            SetOpenDuration(TimeSpan.FromSeconds(1));
-        }
+    //    public FactoryHelper()
+    //    {
+    //        _supplierThreadMock = new MockSubscriberThread(TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3));
+    //        SetOpenDuration(TimeSpan.FromSeconds(1));
+    //    }
 
-        #endregion Constructors
+    //    #endregion Constructors
 
-        public FactoryHelper SetOpenDuration(TimeSpan timeSpan)
-        {
-            _supplierThreadMock.OpenTimeout = timeSpan;
-            return this;
-        }
+    //    public FactoryHelper SetOpenDuration(TimeSpan timeSpan)
+    //    {
+    //        _supplierThreadMock.OpenTimeout = timeSpan;
+    //        return this;
+    //    }
 
-        public FactoryHelper SetProcessDuration(TimeSpan timeSpan)
-        {
-            _supplierThreadMock.ProcessingInterval = timeSpan;
-            return this;
-        }
+    //    public FactoryHelper SetProcessDuration(TimeSpan timeSpan)
+    //    {
+    //        _supplierThreadMock.ProcessingInterval = timeSpan;
+    //        return this;
+    //    }
 
-        public IObservableConnection GetListener()
-        {
-            return new ConnectionEntryPoint(null, _supplierThreadMock);
-        }
+    //    public IObservableConnection GetListener()
+    //    {
+    //        return new ConnectionEntryPoint(null, _supplierThreadMock);
+    //    }
 
-        #region Nested type: MockSubscriberThread
+    //    #region Nested type: MockSubscriberThread
 
-        private class MockSubscriberThread : IRabbitMqSubscriber
-        {
-            #region Constructors
+    //    private class MockSubscriberThread : IRabbitMqSubscriber
+    //    {
+    //        #region Constructors
 
-            public MockSubscriberThread(TimeSpan openTimeout, TimeSpan processingInterval)
-            {
-                OpenTimeout = openTimeout;
-                ProcessingInterval = processingInterval;
-            }
+    //        public MockSubscriberThread(TimeSpan openTimeout, TimeSpan processingInterval)
+    //        {
+    //            OpenTimeout = openTimeout;
+    //            ProcessingInterval = processingInterval;
+    //        }
 
-            #endregion Constructors
+    //        #endregion Constructors
 
-            public TimeSpan OpenTimeout { get; set; }
+    //        public TimeSpan OpenTimeout { get; set; }
 
-            public TimeSpan ProcessingInterval { get; set; }
+    //        public TimeSpan ProcessingInterval { get; set; }
 
-            #region IRabbitMqSubscriber Members
+    //        #region IRabbitMqSubscriber Members
 
-            public Task<object> SubscribeAsync(QueueSubscription subscription)
-            {
-                var taskCompletionSource = new TaskCompletionSource<object>();
-                Task.Run(() =>
-                {
-                    Task.Delay(OpenTimeout).Wait();
-                    subscription.OpenEvent.Set();
+    //        public Task<object> SubscribeAsync(QueueSubscription subscription)
+    //        {
+    //            var taskCompletionSource = new TaskCompletionSource<object>();
+    //            Task.Run(() =>
+    //            {
+    //                Task.Delay(OpenTimeout).Wait();
+    //                subscription.OpenEvent.Set();
 
-                    while (subscription.KeepListening)
-                    {
-                        Task.Delay(ProcessingInterval).Wait();
-                    }
+    //                while (subscription.KeepListening)
+    //                {
+    //                    Task.Delay(ProcessingInterval).Wait();
+    //                }
 
-                    taskCompletionSource.SetResult(null);
-                });
-                return taskCompletionSource.Task;
-            }
+    //                taskCompletionSource.SetResult(null);
+    //            });
+    //            return taskCompletionSource.Task;
+    //        }
 
-            #endregion IRabbitMqSubscriber Members
-        }
+    //        #endregion IRabbitMqSubscriber Members
+    //    }
 
-        #endregion Nested type: MockSubscriberThread
-    }
+    //    #endregion Nested type: MockSubscriberThread
+    //}
 }

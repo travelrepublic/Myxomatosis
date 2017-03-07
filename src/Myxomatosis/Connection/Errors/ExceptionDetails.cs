@@ -2,7 +2,7 @@
 
 namespace Myxomatosis.Connection.Errors
 {
-    public class ExceptionDetails
+    internal class ExceptionDetails
     {
         public string Message { get; set; }
 

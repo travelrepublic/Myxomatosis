@@ -15,12 +15,12 @@ namespace Myxomatosis.Tests
     {
         private string _exchange;
         private string _queue;
-        private IQueueOpener _queueConnection;
+        private IQueue _queueConnection;
         private string _routingKey;
         private IQueueConnection _subscription;
         private Dictionary<string, object> _argList;
         private string _ttlQueue;
-        private IQueueOpener _ttlQueueConnection;
+        private IQueue _ttlQueueConnection;
 
         [SetUp]
         public void Init()

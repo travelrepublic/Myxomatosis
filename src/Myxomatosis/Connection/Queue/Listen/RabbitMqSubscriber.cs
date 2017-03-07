@@ -7,49 +7,51 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Myxomatosis.Connection.Queue.Listen
 {
-    internal class RabbitMqSubscriber : IRabbitMqSubscriber
+    /// <summary>
+    /// This class holds the connection to RabbitMQ, and pushes messages on the the observable
+    /// </summary>
+    internal class RabbitMqQueueListener
     {
         private readonly ConnectionFactory _connectionFactory;
         private readonly IRabbitMessageErrorHandler _errorHandler;
         private readonly IRabbitMqClientLogger _logger;
 
+        private Thread _consumingThread;
+        private ManualResetEvent _consumingFinishEvent;
+
         #region Constructors
 
-        public RabbitMqSubscriber(ConnectionFactory connectionFactory,
+        public RabbitMqQueueListener(ConnectionFactory connectionFactory,
             IRabbitMessageErrorHandler errorHandler,
             IRabbitMqClientLogger logger)
         {
             _connectionFactory = connectionFactory;
             _errorHandler = errorHandler;
             _logger = logger;
+            _consumingThread = null;
         }
 
         #endregion Constructors
 
         #region IRabbitMqSubscriber Members
 
-        public async Task<object> SubscribeAsync(QueueSubscription subscription)
+        /// <summary>
+        /// Blocking method which starts listening to the queue
+        /// </summary>
+        /// <param name="subscription"></param>
+        public void Listen(QueueSubscriptionToken subscription)
         {
-            try
-            {
-                var taskCompletionSource = new TaskCompletionSource<object>();
-                Task.Run(() => { SubscribeToQueue(subscription, taskCompletionSource); });
-                return taskCompletionSource.Task;
-            }
-            catch (Exception e)
-            {
-                _logger.LogError("Error initializing connection", e);
-                throw;
-            }
+            ListenToQueue(subscription);
         }
 
         #endregion IRabbitMqSubscriber Members
 
-        private void ListenToQueue(QueueSubscription subscription)
+        private void ListenToQueue(QueueSubscriptionToken subscription)
         {
             using (var connection = _connectionFactory.CreateConnection())
             {
@@ -58,15 +60,16 @@ namespace Myxomatosis.Connection.Queue.Listen
                     var consumer = new QueueingBasicConsumer(model);
                     model.ConfirmSelect(); //try publisher confirms
 
-                    var queueName = subscription.SubscriptionData.Queue;
+                    var queueName = subscription.QueueName;
 
-                    model.DeclareQueue(queueName, subscription.SubscriptionData.Args);
+                    model.DeclareQueue(queueName, subscription.Args);
 
-                    model.BasicQos(0, subscription.SubscriptionData.PrefetchCount, false);
+                    model.BasicQos(0, subscription.PrefetchCount, false);
                     model.BasicConsume(queueName, false, consumer);
                     subscription.OpenEvent.Set();
 
                     _logger.LogTrace("Subscription set up with Channel Hash {0}", model.GetHashCode());
+                    subscription.KeepListening = true;
 
                     while (subscription.KeepListening)
                     {
@@ -100,10 +103,11 @@ namespace Myxomatosis.Connection.Queue.Listen
                         }
                     }
                 }
+                subscription.ClosedEvent.Set();
             }
         }
 
-        private void SubscribeToQueue(QueueSubscription subscription, TaskCompletionSource<object> taskCompletionSource)
+        private void SubscribeToQueue(QueueSubscriptionToken subscription)
         {
             try
             {
@@ -111,21 +115,18 @@ namespace Myxomatosis.Connection.Queue.Listen
             }
             catch (EndOfStreamException eosE)
             {
-                SubscribeToQueue(subscription, taskCompletionSource);
+                SubscribeToQueue(subscription);
                 _logger.LogWarn("EndOfStreamException caught.  Will try to reconnect...");
             }
             catch (Exception e)
             {
                 _logger.LogError("Error in queue subscriber", e);
-                taskCompletionSource.SetException(e);
                 return;
             }
             finally
             {
                 subscription.MessageObserver.OnCompleted();
             }
-
-            taskCompletionSource.SetResult(null);
         }
     }
 

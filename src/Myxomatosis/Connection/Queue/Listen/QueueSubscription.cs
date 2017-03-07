@@ -6,56 +6,60 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Myxomatosis.Connection.Queue.Listen
 {
-    public class QueueSubscriptionCache
+    /// <summary>
+    /// Centralised place to ensure that we only create one connection for each queue per AppDomain
+    /// </summary>
+    internal class QueueSubscriptionCache
     {
-        private readonly ConcurrentDictionary<string, QueueSubscription> _subscriptions;
+        private readonly ConcurrentDictionary<string, QueueSubscriptionToken> _subscriptions;
 
         #region Constructors
 
         public QueueSubscriptionCache()
         {
-            _subscriptions = new ConcurrentDictionary<string, QueueSubscription>();
+            _subscriptions = new ConcurrentDictionary<string, QueueSubscriptionToken>();
         }
 
         #endregion Constructors
 
-        public QueueSubscription Create(string queueName, ushort prefetchCount, Dictionary<string, object> args )
+        public QueueSubscriptionToken Create(string queueName, ushort prefetchCount, Dictionary<string, object> args )
         {
-            return _subscriptions.GetOrAdd(queueName, q => new QueueSubscription(q, prefetchCount, args));
+            return _subscriptions.GetOrAdd(queueName, q => new QueueSubscriptionToken(q, prefetchCount, args));
         }
 
         public void Remove(string queueName)
         {
-            QueueSubscription removedItem;
+            QueueSubscriptionToken removedItem;
             _subscriptions.TryRemove(queueName, out removedItem);
         }
     }
 
-    public class QueueSubscription : IDisposable
+    internal class QueueSubscriptionToken : IDisposable
     {
+        private int _keepListeningInt;
         private readonly ReplaySubject<RabbitMessage> _subject;
 
         #region Constructors
 
-        internal QueueSubscription(string queue, ushort prefetchCount, Dictionary<string, object> args )
+        internal QueueSubscriptionToken(string queue, ushort prefetchCount, Dictionary<string, object> args )
         {
             _subject = new ReplaySubject<RabbitMessage>();
-            SubscriptionData = new QueueSubscriptionData(queue)
-            {
-                PrefetchCount = prefetchCount,
-                Args = args
-            };
-            KeepListening = true;
+            _keepListeningInt = 0;
+            QueueName = queue;
+            PrefetchCount = prefetchCount;
+            Args = args;
             OpenEvent = new ManualResetEvent(false);
+            ClosedEvent = new ManualResetEvent(false);
         }
 
         #endregion Constructors
 
-        public QueueSubscriptionData SubscriptionData { get; private set; }
+        public string QueueName { get; private set; }
+        public ushort PrefetchCount { get; private set; }
+        public Dictionary<string,object> Args { get; private set; }
 
         public IObservable<RabbitMessage> MessageSource
         {
@@ -67,11 +71,21 @@ namespace Myxomatosis.Connection.Queue.Listen
             get { return _subject.AsObserver(); }
         }
 
-        public Task ConsumingTask { get; internal set; }
+        public bool KeepListening
+        {
+            set
+            {
+                var keepListeningInt = value ? 1 : 0;
+                Interlocked.Exchange(ref _keepListeningInt, keepListeningInt);
+            }
+            get
+            {
+                return Interlocked.Equals(_keepListeningInt, 1);
+            }
+        }
 
-        public bool KeepListening { get; internal set; }
-
-        public ManualResetEvent OpenEvent { get; private set; }
+        internal ManualResetEvent OpenEvent { get; private set; }
+        internal ManualResetEvent ClosedEvent { get; private set; }
 
         #region IDisposable Members
 
@@ -80,6 +94,8 @@ namespace Myxomatosis.Connection.Queue.Listen
             try
             {
                 _subject.Dispose();
+                (OpenEvent as IDisposable).Dispose();
+                (ClosedEvent as IDisposable).Dispose();
             }
             catch (Exception)
             {
