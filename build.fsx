@@ -50,7 +50,7 @@ Target "Pack" (fun _ ->
                 { FrameworkVersion = "net45"
                   Dependencies = [ "Newtonsoft.Json",       "[7.0.1, )" 
                                    "RabbitMQ.Client",       "[3.2.0, )" 
-                                   "System.Reactive.Linq",  "[3.3.0, )"  ]
+                                   "System.Reactive.Linq",  "[3.0.0, )"  ]
                 }
               ]
             Files = [ "**/Myxomatosis.*", None, None ]
