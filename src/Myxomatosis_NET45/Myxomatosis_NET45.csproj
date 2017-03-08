@@ -160,7 +160,7 @@
     <Compile Include="..\Myxomatosis\Serialization\ISerializer.cs">
       <Link>ISerializer.cs</Link>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\Myxomatosis\Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
