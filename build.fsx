@@ -47,16 +47,22 @@ Target "Pack" (fun _ ->
             OutputPath = buildDir
             Version = buildVersion
             Dependencies = [  "Newtonsoft.Json",       "[7.0.1, )" 
-                              "RabbitMQ.Client",       "[3.2.0, )" 
                               "System.Reactive.Linq",  "[3.0.0, )"  ]
-            // DependenciesByFramework =
-            //   [
-            //     { FrameworkVersion = "net45"
-            //       Dependencies = [ "Newtonsoft.Json",       "[7.0.1, )"
-            //                        "RabbitMQ.Client",       "[3.2.0, )"
-            //                        "System.Reactive.Linq",  "[3.0.0, )"  ]
-            //     }
-            //   ]
+            DependenciesByFramework =
+              [
+                { FrameworkVersion = "net45"
+                  Dependencies = [ 
+                                   "RabbitMQ.Client",       "[3.2.0, 3.4.0)" ]
+                }
+                { FrameworkVersion = "net452"
+                  Dependencies = [ 
+                                   "RabbitMQ.Client",       "[4.0.0, )" ]
+                }
+                { FrameworkVersion = "net46"
+                  Dependencies = [ 
+                                   "RabbitMQ.Client",       "[4.0.0, )" ]
+                }
+              ]
             Files = [ "**/Myxomatosis.*", None, None ]
         }
       ) (sourceDir @@ ".nuget/template")

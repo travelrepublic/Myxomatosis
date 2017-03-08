@@ -18,6 +18,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myxomatosis_NET452", "Myxom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Myxomatosis_NET46", "Myxomatosis_NET46\Myxomatosis_NET46.csproj", "{E1F0D750-8BEB-4C56-BBE8-0CD0690CBA90}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ConsoleApplication4", "..\..\..\..\Users\ltaylor\Documents\Visual Studio 2015\Projects\ConsoleApplication4\ConsoleApplication4\ConsoleApplication4.fsproj", "{E9F41377-6D31-4BB9-BBE5-EE558E909118}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,7 +35,6 @@ Global
 		{73E683DF-0881-4C5B-812D-BE7A5D583D69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73E683DF-0881-4C5B-812D-BE7A5D583D69}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6433AAEB-C28E-4039-A4EF-C315EE48A2EB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C67F0F88-2938-4BEF-B079-6F41F9BE54E1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -44,6 +45,10 @@ Global
 		{E1F0D750-8BEB-4C56-BBE8-0CD0690CBA90}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E1F0D750-8BEB-4C56-BBE8-0CD0690CBA90}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E1F0D750-8BEB-4C56-BBE8-0CD0690CBA90}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9F41377-6D31-4BB9-BBE5-EE558E909118}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9F41377-6D31-4BB9-BBE5-EE558E909118}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9F41377-6D31-4BB9-BBE5-EE558E909118}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9F41377-6D31-4BB9-BBE5-EE558E909118}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
